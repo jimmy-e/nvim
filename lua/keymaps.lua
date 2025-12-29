@@ -64,3 +64,7 @@ local dapui_ok, dapui = pcall(require, "dapui")
 if dapui_ok then
   vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "Debug: Toggle UI" })
 end
+
+vim.keymap.set("n", "<leader>?", function()
+  require("cheatsheet").open()
+end, { desc = "Cheat sheet" })

@@ -1,0 +1,182 @@
+VIM PRACTICE FILE
+=================
+
+This file is meant to be practiced on.
+Do NOT worry about breaking things.
+Repeat exercises until your hands learn them.
+
+------------------------------------------------------------
+SECTION 1 — BASIC MOVEMENT
+------------------------------------------------------------
+
+Move the cursor using:
+- h (left)  j (down)  k (up)  l (right)
+
+Task:
+1. Move to the beginning of this paragraph.
+2. Move word-by-word to the end of the line using `w`.
+3. Move backward word-by-word using `b`.
+4. Jump to the end of the line using `$`.
+5. Jump to the first non-whitespace character using `^`.
+
+------------------------------------------------------------
+SECTION 2 — WORDS & LINES
+------------------------------------------------------------
+
+The quick brown fox jumps over the lazy dog.
+Editing text efficiently requires precise motions.
+Vim excels when you combine motions with actions.
+
+Tasks:
+- Use `0`, `^`, `$` on each line.
+- Jump between lines using `j` and `k`.
+- Jump to the top with `gg`.
+- Jump to the bottom with `G`.
+
+------------------------------------------------------------
+SECTION 3 — INSERTING TEXT
+------------------------------------------------------------
+
+Place your cursor somewhere in this section.
+
+Tasks:
+- Press `i` to insert before the cursor.
+- Press `a` to insert after the cursor.
+- Press `o` to open a new line BELOW.
+- Press `O` to open a new line ABOVE.
+- Press `Esc` to return to Normal mode.
+
+------------------------------------------------------------
+SECTION 4 — DELETING & CHANGING
+------------------------------------------------------------
+
+delete this word
+change this word
+remove this entire line
+replace only this part
+
+Tasks:
+- Put cursor on a word and type `diw`.
+- Put cursor on a word and type `ciw` then retype it.
+- Delete a full line with `dd`.
+- Undo with `u`.
+- Redo with `Ctrl+r`.
+
+------------------------------------------------------------
+SECTION 5 — VISUAL MODE (SELECTING TEXT)
+------------------------------------------------------------
+
+Select this sentence character by character.
+Select this entire line.
+Select this column block.
+
+Tasks:
+- Use `v` to select characters.
+- Use `V` to select whole lines.
+- Use `Ctrl+v` for block selection.
+- Yank (copy) with `y`.
+- Paste with `p`.
+
+------------------------------------------------------------
+SECTION 6 — COPYING & PASTING
+------------------------------------------------------------
+
+Copy this line.
+Paste it below.
+Paste it again.
+Paste it again.
+
+Tasks:
+- Yank a line with `yy`.
+- Paste multiple times using `p`.
+- Try pasting ABOVE the cursor with `P`.
+
+------------------------------------------------------------
+SECTION 7 — SEARCH
+------------------------------------------------------------
+
+Search for the word apple.
+Search for the word banana.
+Search for the word cherry.
+
+apple
+banana
+cherry
+banana
+apple
+
+Tasks:
+- Search forward with `/banana`.
+- Search backward with `?apple`.
+- Jump matches with `n` and `N`.
+
+------------------------------------------------------------
+SECTION 8 — COMBINING ACTIONS (THE CORE SKILL)
+------------------------------------------------------------
+
+Change everything inside these parentheses (like this text here).
+Delete everything inside these quotes "remove this completely".
+Modify only the word under the cursor.
+
+Tasks:
+- Use `ci(` and `di(`.
+- Use `ci"` and `di"`.
+- Use `cw` vs `ciw`.
+
+------------------------------------------------------------
+SECTION 9 — MULTI-LINE NAVIGATION
+------------------------------------------------------------
+
+Paragraph one.
+It has multiple lines.
+Practice jumping.
+
+Paragraph two.
+Use paragraph motions.
+They are very useful.
+
+Tasks:
+- Jump paragraphs with `{` and `}`.
+- Yank a full paragraph.
+- Delete a paragraph.
+
+------------------------------------------------------------
+SECTION 10 — REALISTIC EDITING
+------------------------------------------------------------
+
+def example_function(param1, param2):
+    value_one = param1 + param2
+    value_two = param1 * param2
+    return value_one + value_two
+
+Tasks:
+- Change variable names using `ciw`.
+- Duplicate lines using `yy` and `p`.
+- Delete unused lines.
+- Reorder lines by cutting (`dd`) and pasting.
+
+------------------------------------------------------------
+SECTION 11 — WINDOW PRACTICE (OPTIONAL)
+------------------------------------------------------------
+
+Tasks:
+- Open a terminal: <Space>t
+- Navigate splits with Ctrl-h/j/k/l
+- Close a split with :q
+
+------------------------------------------------------------
+SECTION 12 — GIT PRACTICE (OPTIONAL)
+------------------------------------------------------------
+
+Tasks (inside a git repo):
+- Open Git UI: <Space>gs
+- Toggle blame: <Space>gb
+- Move hunks with ]c and [c
+- Preview hunk: <Space>gh
+
+------------------------------------------------------------
+END OF PRACTICE
+------------------------------------------------------------
+
+Repeat this file often.
+Speed comes from repetition, not memorization.
