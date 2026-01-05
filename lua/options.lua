@@ -19,7 +19,6 @@ vim.opt.smartcase = true
 vim.opt.clipboard = "unnamedplus"
 
 -- Folding (code collapse like VSCode)
--- Using indent-based folding (simple and reliable)
 vim.opt.foldmethod = "indent"
 vim.opt.foldlevel = 99  -- Open all folds by default
 vim.opt.foldlevelstart = 99  -- Start with all folds open
@@ -59,3 +58,27 @@ vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
 --   pattern = "*",
 --   command = "startinsert",
 -- })
+
+-- Enhanced visual settings for more color
+vim.opt.list = true  -- Show invisible characters
+vim.opt.listchars = {
+  tab = "→ ",
+  trail = "·",
+  extends = "⟩",
+  precedes = "⟨",
+  nbsp = "␣",
+}
+
+-- Make cursor line more visible
+vim.api.nvim_set_hl(0, "CursorLine", { bg = "#2a2a3a" })
+vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#f38ba8", bold = true })
+
+-- Make line numbers more colorful
+vim.api.nvim_set_hl(0, "LineNr", { fg = "#6c7086" })
+vim.api.nvim_set_hl(0, "LineNrAbove", { fg = "#585b70" })
+vim.api.nvim_set_hl(0, "LineNrBelow", { fg = "#585b70" })
+
+-- Enable filetype detection (required for proper plugin behavior)
+vim.cmd([[
+  filetype plugin indent on
+]])

@@ -1,334 +1,120 @@
 local M = {}
 
+-- Define highlight groups for colors
+local function setup_highlights()
+  vim.api.nvim_set_hl(0, "CheatHeader", { fg = "#89b4fa", bold = true })
+  vim.api.nvim_set_hl(0, "CheatSection", { fg = "#cba6f7", bold = true })
+  vim.api.nvim_set_hl(0, "CheatKey", { fg = "#f38ba8" })  -- Light red for keybindings
+  vim.api.nvim_set_hl(0, "CheatDesc", { fg = "#a6adc8" })  -- Gray for descriptions
+  vim.api.nvim_set_hl(0, "CheatBorder", { fg = "#585b70" })
+end
+
+local function pad_right(str, width)
+  local len = vim.fn.strdisplaywidth(str)
+  if len >= width then
+    return str:sub(1, width)
+  end
+  return str .. string.rep(" ", width - len)
+end
+
+local function create_section_lines(title, items)
+  local lines = {}
+  table.insert(lines, "┌─ " .. title .. " " .. string.rep("─", 32 - #title) .. "┐")
+  for _, item in ipairs(items) do
+    table.insert(lines, "│ " .. pad_right(item, 34) .. "│")
+  end
+  table.insert(lines, "└" .. string.rep("─", 36) .. "┘")
+  return lines
+end
+
 local function lines()
   return {
-    "NEOVIM CHEAT SHEET - Complete Guide",
-    "================================================================",
     "",
-    "📁 PROJECT / GENERAL",
-    "  <Space>w            Save file (manual - auto-save is enabled)",
-    "  <Space>q            Quit window",
-    "  <Space>e            Toggle file tree",
-    "  <Space>ff           Find files (Telescope)",
-    "  <Space>fg           Live grep (search in files)",
-    "  <Space>fb           List open buffers",
-    "  <Space>?            Open this cheat sheet",
-    "  <Space>z            Focus mode (Zen Mode toggle)",
-    "  <Space>ta           Toggle auto-save on/off",
+    "                          🚀 NEOVIM CHEAT SHEET 🚀",
+    "        ═══════════════════════════════════════════════════════════",
     "",
-    "📋 CODE FOLDING (Collapse/Expand)",
-    "  <Space>↑            Collapse all (like VSCode)",
-    "  <Space>↓            Expand all (like VSCode)",
-    "  <Space><Space>      Toggle fold under cursor",
-    "  <Space>fc           Close fold under cursor",
-    "  <Space>fo           Open fold under cursor",
-    "  <Space>ft           Toggle fold under cursor",
-    "  zc / zo / za        Close / Open / Toggle fold (native)",
+    "┌─ 📁 GENERAL ──────────────┐  ┌─ 🤖 AI (AVANTE) ──────────┐  ┌─ 🔀 GIT ──────────────────┐",
+    "│ <Space>w   Save file       │  │ <Space>aa  Ask AI          │  │ <Space>gs  Git sidebar     │",
+    "│ <Space>q   Quit            │  │ <Space>ac  Open chat       │  │ <Space>gm  Git menu        │",
+    "│ <Space>e   File tree       │  │ <Space>at  Toggle sidebar  │  │ <Space>gb  Toggle blame    │",
+    "│ <Space>ff  Find files      │  │ <Space>af  Focus sidebar   │  │ <Space>gh  Preview hunk    │",
+    "│ <Space>fg  Live grep       │  │ <Space>ar  Refresh         │  │ <Space>gr  Reset hunk      │",
+    "│ <Space>fb  Buffers         │  │ <Space>aB  Add buffers     │  │ <Space>go  Open diff       │",
+    "│ <Space>?   Cheat sheet     │  │ <Space>as  Show repo map   │  │ <Space>gf  File history    │",
+    "│ <Space>z   Zen mode        │  │ <Space>aS  Stop request    │  │ ]c/[c      Next/Prev hunk  │",
+    "│ <Space>ta  Toggle autosave │  └────────────────────────────┘  └────────────────────────────┘",
+    "└────────────────────────────┘",
     "",
-    "🌳 FILE EXPLORER (NvimTree)",
-    "  x                   Cut (move) file/folder",
-    "  p                   Paste (after cut)",
-    "  r                   Rename",
-    "  d                   Delete",
-    "  a                   Create file/dir (add trailing / for dir)",
-    "  R                   Refresh tree",
-    "  q                   Close tree",
+    "┌─ 🎯 HARPOON ──────────────┐  ┌─ 📄 LSP ───────────────────┐  ┌─ ✏️  EDITING ──────────────┐",
+    "│ <Space>ha   Add file       │  │ gd          Go to def      │  │ <Space>k/j Move line up/dn  │",
+    "│ <Space>hh   Toggle menu    │  │ gD          Declaration    │  │ dd         Delete line      │",
+    "│ <Space>h1-4 Jump to file   │  │ gi          Implementation │  │ yy         Copy line        │",
+    "│ <Space>hn   Next           │  │ gr          References     │  │ p/P        Paste after/bfr  │",
+    "│ <Space>hp   Previous       │  │ K           Hover docs     │  │ u          Undo             │",
+    "│ <Space>hc   Clear all      │  │ <Space>rn   Rename         │  │ Ctrl+r     Redo             │",
+    "└────────────────────────────┘  │ <Space>ca   Code actions   │  │ ciw        Change word      │",
+    "                                │ <Space>f    Format         │  │ >>         Indent right     │",
+    "┌─ 📋 FOLDING ──────────────┐   │ ]d/[d       Next/Prev err  │  │ <<         Indent left      │",
+    "│ <Space>↑   Collapse all    │  └────────────────────────────┘  └────────────────────────────┘",
+    "│ <Space>↓   Expand all      │",
+    "│ <Space>    Toggle fold     │  ┌─ 🐛 DEBUGGER ──────────────┐  ┌─ 🎯 MODES ─────────────────┐",
+    "│ zc/zo/za   Close/Open/Tog  │  │ <Space>dc  Continue/Start  │  │ i          Insert mode      │",
+    "└────────────────────────────┘  │ <Space>dn  Step over       │  │ a          Insert after     │",
+    "                                │ <Space>di  Step into       │  │ I/A        Start/End line   │",
+    "┌─ 🪟 WINDOWS ───────────────┐  │ <Space>do  Step out        │  │ v          Visual mode      │",
+    "│ <C-h/j/k/l> Navigate split │  │ <Space>db  Breakpoint      │  │ V          Visual line      │",
+    "│ <C-w>w      Cycle splits   │  │ <Space>du  Toggle UI       │  │ Ctrl+v     Visual block     │",
+    "│ <C-w>=      Equal size     │  │ <Space>dq  Stop            │  │ Esc        Normal mode      │",
+    "│ :split      Horizontal     │  └────────────────────────────┘  └────────────────────────────┘",
+    "│ :vsplit     Vertical       │",
+    "└────────────────────────────┘  ┌─ ⏪ UNDOTREE ──────────────┐",
+    "                                │ <Space>u   Toggle undo tree│",
+    "                                │ j/k        Navigate history│",
+    "                                │ Enter      Restore state   │",
+    "                                └────────────────────────────┘",
     "",
-    "💻 TERMINAL / RUN",
-    "  <Space>t            Open terminal (bottom split)",
-    "  <Space>rp           Run current Python file (.venv)",
-    "  :q                  Close terminal (in terminal window)",
-    "  Ctrl+\\ Ctrl+n      Exit terminal mode to normal mode",
+    "        ═══════════════════════════════════════════════════════════",
+    "                          🚀 NAVIGATION & MOTIONS",
+    "        ───────────────────────────────────────────────────────────",
     "",
-    "🤖 AI / LLM (AVANTE - Claude Sonnet 4.5)",
-    "  <Space>aa           Ask AI (in normal mode: about file, in visual: selection)",
-    "  <Space>ac           Open persistent AI chat",
-    "  <Space>at           Toggle AI sidebar",
-    "  <Space>af           Focus AI sidebar",
-    "  <Space>ar           Refresh AI sidebar",
-    "  <Space>aB           Add all buffers to AI context",
-    "  <Space>as           Show repo map",
-    "  <Space>aS           Clear/Stop AI request",
+    "  BASIC:  h/j/k/l ← ↓ ↑ →    JUMP:  <Space>J/K Down/Up 20   LINE:  0/^/$ Start/First/End",
+    "  FILE:   gg/G Top/Bottom    FIND:  f<x>/t<x> Find/Till     BRACKET: % Match paren",
+    "  SEARCH: /text Forward      */#  Word under cursor        JUMP:  Ctrl+o/i Back/Forward",
+    "  SCROLL: Ctrl+u/d Half      Ctrl+b/f Full page            zz Center screen",
     "",
-    "  Inside Avante Sidebar:",
-    "  ]p / [p             Next / previous prompt",
-    "  a                   Apply at cursor",
-    "  A                   Apply all suggestions",
-    "  r                   Retry request",
-    "  e                   Edit request",
-    "  @                   Add file to context",
-    "  d                   Remove file from context",
-    "  q                   Close sidebar",
-    "  Tab / Shift+Tab     Switch between windows",
+    "        ═══════════════════════════════════════════════════════════",
+    "                          🎯 TEXT OBJECTS & SEARCH",
+    "        ───────────────────────────────────────────────────────────",
     "",
-    "✨ CODE COMPLETION (in Insert mode)",
-    "  Ctrl+Space          Trigger completion menu",
-    "  Tab                 Accept current completion",
-    "  Shift+Tab           Previous completion item",
-    "  Ctrl+e              Close completion menu",
-    "  Enter               Accept completion",
-    "  [AI]                Copilot AI suggestion",
-    "  [LSP]               Language server suggestion",
-    "  [Buf]               Buffer word suggestion",
-    "  [Path]              File path suggestion",
+    "  OBJECTS:  iw/aw Word    i\"/a\" Quotes    i(/a( Parens    i{/a{ Braces    ip/ap Paragraph",
+    "  EXAMPLES: diw Del word  ci\" Change quote  yap Yank para  va{ Select braces",
+    "  SEARCH:   /text →       ?text ←           n Next         N Prev         :noh Clear",
     "",
-    "🐛 DEBUGGER (PYTHON / DEBUGPY)",
-    "  <Space>dc           Start / Continue debug",
-    "  <Space>dn           Step over (next line)",
-    "  <Space>di           Step into (enter function)",
-    "  <Space>do           Step out (exit function)",
-    "  <Space>db           Toggle breakpoint",
-    "  <Space>dB           Conditional breakpoint",
-    "  <Space>dr           Open debug REPL",
-    "  <Space>du           Toggle debug UI",
-    "  <Space>dl           Run last debug session",
-    "  <Space>dq           Stop debugging / terminate",
-    "  <Space>df           FastAPI AWS debug helper",
+    "        ═══════════════════════════════════════════════════════════",
+    "               Press 'q' or 'Esc' to close  •  Auto-save enabled",
     "",
-    "  FastAPI debug workflow:",
-    "    Terminal: python -Xfrozen_modules=off -m debugpy --listen 5678",
-    "              --wait-for-client -m uvicorn app:fast_app --port 8000",
-    "    Neovim: <Space>dc → Choose: Attach (debugpy :5678)",
-    "",
-    "📄 LSP (Language Server - Code Intelligence)",
-    "  gd                  Go to definition",
-    "  gD                  Go to declaration",
-    "  gi                  Go to implementation",
-    "  gt                  Go to type definition",
-    "  gr                  Find references (Telescope)",
-    "  K                   Hover documentation",
-    "  <Space>rn           Rename symbol",
-    "  <Space>ca           Code actions (fixes/refactors)",
-    "  <Space>f            Format document",
-    "  ]d / [d             Next / previous diagnostic",
-    "  <Space>e            Show diagnostic popup",
-    "",
-    "  LSP Management:",
-    "  :Mason              Open Mason (LSP installer)",
-    "  :LspInfo            Show LSP status",
-    "  :LspRestart         Restart LSP servers",
-    "  :LspPythonPath      Show Python path (for .venv)",
-    "",
-    "🔍 PREVIEWS",
-    "  <Space>mp           Markdown: Preview toggle",
-    "  <Space>ms           Markdown: Preview stop",
-    "  <Space>cv           CSV: Table view toggle",
-    "",
-    "🔀 GIT / VERSION CONTROL",
-    "  <Space>gs           Git status (Neogit)",
-    "  <Space>gm           Git menu (GitLens-style popup)",
-    "",
-    "  Git Hunks:",
-    "  ]c / [c             Next / previous git hunk",
-    "  <Space>gh           Preview hunk",
-    "  <Space>gr           Reset hunk",
-    "",
-    "  Git Blame:",
-    "  <Space>gb           Toggle inline blame (shows author on line)",
-    "  <Space>gk           Toggle hover blame popup (on cursor hold)",
-    "  <Space>gB           Full blame info (commit details popup)",
-    "",
-    "  Git Diff/History:",
-    "  <Space>go           Open diff view (see all changes)",
-    "  <Space>gq           Close diff view",
-    "  <Space>gf           Current file commit history",
-    "  <Space>gF           Full repo commit history",
-    "  <Space>gd           Diff current file against HEAD",
-    "",
-    "  Inside Neogit:",
-    "  s                   Stage hunk/file",
-    "  u                   Unstage hunk/file",
-    "  c                   Commit",
-    "  p                   Push",
-    "  P                   Pull",
-    "  q                   Close Neogit",
-    "",
-    "🪟 WINDOWS / SPLITS",
-    "  <C-w>w              Cycle through splits",
-    "  <C-w>=              Equalize split sizes",
-    "  <C-h>               Move to left split",
-    "  <C-j>               Move to bottom split",
-    "  <C-k>               Move to top split",
-    "  <C-l>               Move to right split",
-    "  :split              Horizontal split",
-    "  :vsplit             Vertical split",
-    "  :q                  Close current split",
-    "",
-    "🎯 VIM MODES (Essential for Beginners!)",
-    "  i                   Insert mode (before cursor)",
-    "  a                   Insert mode (after cursor)",
-    "  I                   Insert at start of line",
-    "  A                   Insert at end of line",
-    "  Esc                 Return to Normal mode",
-    "  v                   Visual mode (select characters)",
-    "  V                   Visual line mode (select lines)",
-    "  Ctrl+v              Visual block mode (select columns)",
-    "",
-    "🚀 NAVIGATION MOTIONS (Normal mode)",
-    "  Basic movement:",
-    "  h j k l             Left / down / up / right",
-    "",
-    "  Word movement:",
-    "  w                   Next word start",
-    "  W                   Next WORD start (ignores punctuation)",
-    "  b                   Previous word start",
-    "  B                   Previous WORD start",
-    "  e                   Next word end",
-    "  E                   Next WORD end",
-    "",
-    "  Line movement:",
-    "  0                   Start of line",
-    "  ^                   First non-blank character",
-    "  $                   End of line",
-    "  g_                  Last non-blank character",
-    "",
-    "  File navigation:",
-    "  gg                  Go to top of file",
-    "  G                   Go to bottom of file",
-    "  <number>G           Go to line number (e.g., 42G)",
-    "  <number>gg          Go to line number (e.g., 42gg)",
-    "  %                   Jump to matching bracket/paren",
-    "",
-    "  Paragraph/Block:",
-    "  {                   Previous paragraph/block",
-    "  }                   Next paragraph/block",
-    "",
-    "  Screen navigation:",
-    "  H                   Top of screen (High)",
-    "  M                   Middle of screen",
-    "  L                   Bottom of screen (Low)",
-    "  Ctrl+u              Scroll up half page",
-    "  Ctrl+d              Scroll down half page",
-    "  Ctrl+b              Scroll up full page (Back)",
-    "  Ctrl+f              Scroll down full page (Forward)",
-    "  zz                  Center cursor on screen",
-    "",
-    "🔍 SEARCH & FIND",
-    "  /text               Search forward",
-    "  ?text               Search backward",
-    "  n                   Next match",
-    "  N                   Previous match",
-    "  *                   Search word under cursor (forward)",
-    "  #                   Search word under cursor (backward)",
-    "  :noh                Clear search highlighting",
-    "",
-    "✏️  EDITING BASICS",
-    "  Moving lines (VSCode-style):",
-    "  <Space>k / <Space>j Move line/selection up/down",
-    "",
-    "  Deleting:",
-    "  x                   Delete character under cursor",
-    "  X                   Delete character before cursor",
-    "  dd                  Delete line",
-    "  dw                  Delete word",
-    "  D                   Delete to end of line",
-    "  d$                  Delete to end of line (same as D)",
-    "  d0                  Delete to start of line",
-    "",
-    "  Copying (yanking):",
-    "  yy                  Yank (copy) line",
-    "  yw                  Yank word",
-    "  y$                  Yank to end of line",
-    "  y0                  Yank to start of line",
-    "",
-    "  Pasting:",
-    "  p                   Paste after cursor/line",
-    "  P                   Paste before cursor/line",
-    "",
-    "  Changing (delete + insert):",
-    "  cc                  Change entire line",
-    "  cw                  Change word",
-    "  C                   Change to end of line",
-    "  ciw                 Change inner word (cursor anywhere in word)",
-    "  caw                 Change around word (includes spaces)",
-    "  ci\"                 Change inside quotes",
-    "  ci(                 Change inside parentheses",
-    "  ci{                 Change inside braces",
-    "",
-    "  Replacing:",
-    "  r<char>             Replace character under cursor",
-    "  R                   Replace mode (overwrite)",
-    "",
-    "  Indenting:",
-    "  >>                  Indent line right",
-    "  <<                  Indent line left",
-    "  ==                  Auto-indent line",
-    "",
-    "  New lines:",
-    "  o                   Open new line below",
-    "  O                   Open new line above",
-    "",
-    "  Undo/Redo:",
-    "  u                   Undo",
-    "  Ctrl+r              Redo",
-    "",
-    "🎯 TEXT OBJECTS (use with d/c/y/v)",
-    "  iw / aw             Inner word / around word",
-    "  is / as             Inner sentence / around sentence",
-    "  ip / ap             Inner paragraph / around paragraph",
-    "  i\" / a\"             Inside quotes / around quotes",
-    "  i' / a'             Inside single quotes / around",
-    "  i( / a(             Inside parens / around parens",
-    "  i[ / a[             Inside brackets / around brackets",
-    "  i{ / a{             Inside braces / around braces",
-    "  it / at             Inside HTML tag / around tag",
-    "",
-    "  Examples:",
-    "    diw               Delete inner word",
-    "    ci\"               Change text inside quotes",
-    "    yap               Yank entire paragraph",
-    "    va{               Visual select around braces",
-    "",
-    "💡 COMMON WORKFLOWS",
-    "  Copy line:",
-    "    yy → p            Yank line, paste below",
-    "",
-    "  Move line:",
-    "    dd → p            Delete line, paste below",
-    "",
-    "  Copy word:",
-    "    yiw → p           Yank inner word, paste",
-    "",
-    "  Replace word:",
-    "    ciw → type → Esc  Change inner word, type new, exit",
-    "",
-    "  Select & copy:",
-    "    v → move → y      Visual select, yank",
-    "",
-    "  Duplicate line:",
-    "    yy → p            Yank line, paste",
-    "",
-    "  Delete until character:",
-    "    dt<char>          Delete till character (not including)",
-    "    df<char>          Delete find character (including)",
-    "",
-    "📝 COMMAND MODE",
-    "  :w                  Save",
-    "  :q                  Quit",
-    "  :wq or :x           Save and quit",
-    "  :q!                 Quit without saving",
-    "  :%s/old/new/g       Replace all in file",
-    "  :%s/old/new/gc      Replace all (with confirmation)",
-    "",
-    "================================================================",
-    "Close this cheat sheet: press 'q' or Esc",
   }
 end
 
 function M.open()
+  setup_highlights()
+  
   local buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines())
+  local content = lines()
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, content)
+  
   vim.bo[buf].buftype = "nofile"
   vim.bo[buf].bufhidden = "wipe"
   vim.bo[buf].swapfile = false
   vim.bo[buf].modifiable = false
-  vim.bo[buf].filetype = "markdown"
-
-  local width = math.floor(vim.o.columns * 0.8)
-  local height = math.floor(vim.o.lines * 0.8)
+  vim.bo[buf].filetype = "cheatsheet"
+  
+  -- Size to fit content
+  local width = 118  -- Fixed width for consistent layout
+  local height = math.min(#content + 2, math.floor(vim.o.lines * 0.95))
   local row = math.floor((vim.o.lines - height) / 2)
   local col = math.floor((vim.o.columns - width) / 2)
-
+  
   local win = vim.api.nvim_open_win(buf, true, {
     relative = "editor",
     width = width,
@@ -338,12 +124,142 @@ function M.open()
     style = "minimal",
     border = "rounded",
   })
-
+  
   vim.wo[win].wrap = false
   vim.wo[win].number = false
   vim.wo[win].relativenumber = false
-
-  -- Close with q or Esc
+  vim.wo[win].cursorline = true
+  
+  -- Apply syntax highlighting
+  local ns = vim.api.nvim_create_namespace("cheatsheet")
+  
+  for i, line in ipairs(content) do
+    -- Highlight borders first
+    if line:match("[┌┐└┘├┤│─═]") then
+      vim.api.nvim_buf_add_highlight(buf, ns, "CheatBorder", i - 1, 0, -1)
+    end
+    
+    -- Highlight section titles (emojis + text after ┌─)
+    local section_title = line:match("┌─ (.+) ─+┐")
+    if section_title then
+      local start = line:find(section_title, 1, true)
+      if start then
+        vim.api.nvim_buf_add_highlight(buf, ns, "CheatSection", i - 1, start - 1, start + #section_title - 1)
+      end
+    end
+    
+    -- For lines inside boxes (containing │)
+    if line:match("│") then
+      -- Highlight <Space>... patterns
+      local pos = 1
+      while true do
+        local s, e = line:find("<Space>[%w<>↑↓]+", pos)
+        if not s then break end
+        vim.api.nvim_buf_add_highlight(buf, ns, "CheatKey", i - 1, s - 1, e)
+        pos = e + 1
+      end
+      
+      -- Highlight <C-...> patterns
+      pos = 1
+      while true do
+        local s, e = line:find("<C%-[%w]+>", pos)
+        if not s then break end
+        vim.api.nvim_buf_add_highlight(buf, ns, "CheatKey", i - 1, s - 1, e)
+        pos = e + 1
+      end
+      
+      -- Highlight Ctrl+... patterns
+      pos = 1
+      while true do
+        local s, e = line:find("Ctrl%+[%w\\]", pos)
+        if not s then break end
+        vim.api.nvim_buf_add_highlight(buf, ns, "CheatKey", i - 1, s - 1, e)
+        pos = e + 1
+      end
+      
+      -- Highlight ]x/[x patterns (like ]c/[c, ]d/[d)
+      pos = 1
+      while true do
+        local s, e = line:find("%][%w]/[[]%w]", pos)
+        if not s then break end
+        vim.api.nvim_buf_add_highlight(buf, ns, "CheatKey", i - 1, s - 1, e)
+        pos = e + 1
+      end
+      
+      -- Highlight command patterns at the beginning: "gd", "dd", "yy", etc.
+      -- Match 1-2 letter commands followed by spaces
+      local patterns = {
+        "│%s+([a-z][a-z]?)%s+",           -- Single/double letter
+        "│%s+([a-z][a-z]?/[a-z][a-z]?)%s+", -- Patterns like p/P
+        "│%s+([A-Z])%s+",                 -- Single capital letter
+        "│%s+([%%*#])%s+",                -- Special chars
+        "│%s+(Esc)%s+",                   -- Esc
+        "│%s+(Enter)%s+",                 -- Enter
+        "│%s+(Tab)%s+",                   -- Tab
+      }
+      
+      for _, pattern in ipairs(patterns) do
+        local cmd = line:match(pattern)
+        if cmd then
+          local s = line:find(cmd, 1, true)
+          if s then
+            vim.api.nvim_buf_add_highlight(buf, ns, "CheatKey", i - 1, s - 1, s + #cmd - 1)
+          end
+        end
+      end
+    end
+    
+    -- For bottom section navigation lines
+    if line:match("BASIC:") or line:match("FILE:") or line:match("SEARCH:") or 
+       line:match("SCROLL:") or line:match("OBJECTS:") or line:match("EXAMPLES:") then
+      
+      -- Highlight all command patterns in bottom section
+      local patterns = {
+        "[hH]/[jJ]/[kK]/[lL]",
+        "[wW]/[bB]/[eE]",
+        "[gG][gG]",
+        "[gG]_",
+        "0/%^/%$",
+        "f%<x%>",
+        "t%<x%>",
+        "Ctrl%+[oudbfi]",
+        "zz",
+        "[iI][wW]",
+        "[aA][wW]",
+        "[iI]\"",
+        "[aA]\"",
+        "[iI]%(",
+        "[aA]%(",
+        "[iI]{",
+        "[aA]{",
+        "[iI][pP]",
+        "[aA][pP]",
+        "diw",
+        "ci\"",
+        "yap",
+        "va{",
+        "/text",
+        "%?text",
+        "[nN]",
+        ":noh",
+        "[%%]",
+        "[%*]",
+        "#",
+      }
+      
+      for _, pattern in ipairs(patterns) do
+        local pos = 1
+        while true do
+          local s, e = line:find(pattern, pos)
+          if not s then break end
+          vim.api.nvim_buf_add_highlight(buf, ns, "CheatKey", i - 1, s - 1, e)
+          pos = e + 1
+        end
+      end
+    end
+  end
+  
+  -- Close handlers
   vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = buf, silent = true })
   vim.keymap.set("n", "<Esc>", "<cmd>close<CR>", { buffer = buf, silent = true })
 end

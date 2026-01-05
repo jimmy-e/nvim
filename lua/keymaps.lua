@@ -170,6 +170,69 @@ vim.keymap.set("n", "<leader>as", "<cmd>AvanteShowRepoMap<CR>", { desc = "Avante
 vim.keymap.set("n", "<leader>aS", "<cmd>AvanteClear<CR>", { desc = "Avante: Clear/Stop request" })
 
 ---------------------------------------------------------------
+-- Color/Highlighting test and toggle commands
+---------------------------------------------------------------
+-- Test command to verify syntax highlighting is working
+vim.keymap.set("n", "<leader>th", function()
+  -- Check if Treesitter is active
+  local ts_ok, ts_configs = pcall(require, "nvim-treesitter.configs")
+  if ts_ok then
+    vim.notify("Treesitter is loaded", vim.log.levels.INFO)
+  else
+    vim.notify("Treesitter NOT loaded", vim.log.levels.ERROR)
+  end
+  
+  -- Check current buffer parser
+  local has_parser = vim.treesitter.language.get_lang(vim.bo.filetype)
+  if has_parser then
+    vim.notify("Parser found for " .. vim.bo.filetype, vim.log.levels.INFO)
+  else
+    vim.notify("NO parser for " .. vim.bo.filetype, vim.log.levels.WARN)
+  end
+  
+  -- Force enable Treesitter highlighting
+  vim.cmd("TSBufEnable highlight")
+  vim.notify("Forced Treesitter highlighting ON", vim.log.levels.INFO)
+end, { desc = "Toggle highlights test" })
+
+-- Quick command to force Treesitter
+vim.keymap.set("n", "<leader>tf", function()
+  local ts_ok = pcall(require, "nvim-treesitter")
+  if not ts_ok then
+    vim.notify("Treesitter NOT installed!", vim.log.levels.ERROR)
+    vim.notify("Run :Lazy sync to install it", vim.log.levels.WARN)
+    return
+  end
+  
+  pcall(vim.cmd, "TSBufEnable highlight")
+  vim.cmd("edit")
+  vim.notify("Forced Treesitter refresh", vim.log.levels.INFO)
+end, { desc = "Force Treesitter refresh" })
+
+-- Command to check what's highlighting the file
+vim.keymap.set("n", "<leader>tc", function()
+  local buf = vim.api.nvim_get_current_buf()
+  local ft = vim.bo[buf].filetype
+  
+  vim.notify("Filetype: " .. ft, vim.log.levels.INFO)
+  vim.notify("Syntax: " .. vim.bo[buf].syntax, vim.log.levels.INFO)
+  
+  -- Check if treesitter is active
+  local ts_highlighter = vim.treesitter.highlighter.active[buf]
+  if ts_highlighter then
+    vim.notify("✓ Treesitter IS active!", vim.log.levels.INFO)
+  else
+    vim.notify("✗ Treesitter NOT active", vim.log.levels.WARN)
+  end
+end, { desc = "Check syntax highlighting status" })
+
+---------------------------------------------------------------
+-- Jump up/down 20 lines at a time
+---------------------------------------------------------------
+vim.keymap.set("n", "<leader>J", "20j", { desc = "Jump down 20 lines" })
+vim.keymap.set("n", "<leader>K", "20k", { desc = "Jump up 20 lines" })
+
+---------------------------------------------------------------
 -- Move lines up/down (Space+j/k)
 ---------------------------------------------------------------
 -- Normal mode: move current line

@@ -36,6 +36,8 @@ extend(require("plugins.csv"))
 extend(require("plugins.csvview"))
 extend(require("plugins.markdown"))
 extend(require("plugins.zen"))
+extend(require("plugins.harpoon"))
+extend(require("plugins.undotree"))
 
 -----------------------------------------------------------
 -- Setup lazy.nvim

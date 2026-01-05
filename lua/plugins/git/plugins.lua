@@ -83,8 +83,69 @@ return {
     },
     config = function()
       require("neogit").setup({
-        kind = "tab",
-        integrations = { diffview = true },
+        -- VSCode-style sidebar (vertical split on the right)
+        kind = "vsplit",
+        
+        -- Configure split behavior
+        signs = {
+          section = { "", "" },  -- Collapsible sections
+          item = { "", "" },
+          hunk = { "", "" },
+        },
+        
+        -- Commit popup settings
+        commit_popup = {
+          kind = "split",
+        },
+        
+        -- Popup settings
+        popup = {
+          kind = "split",
+        },
+        
+        -- Integrations
+        integrations = { 
+          diffview = true,
+          telescope = true,
+        },
+        
+        -- Auto-refresh when files change
+        auto_refresh = true,
+        
+        -- Show commit graph
+        graph_style = "unicode",
+        
+        -- Sections to show (like VSCode source control)
+        sections = {
+          untracked = {
+            folded = false,  -- Show untracked files expanded
+            hidden = false,
+          },
+          unstaged = {
+            folded = false,  -- Show unstaged changes expanded
+            hidden = false,
+          },
+          staged = {
+            folded = false,  -- Show staged changes expanded
+            hidden = false,
+          },
+          stashes = {
+            folded = true,
+            hidden = false,
+          },
+          unpulled = {
+            folded = true,
+            hidden = false,
+          },
+          unmerged = {
+            folded = false,
+            hidden = false,
+          },
+          recent = {
+            folded = true,
+            hidden = false,
+          },
+        },
       })
 
       -- Diffview keybinds (GitLens-ish diffs/history)
