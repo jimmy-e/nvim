@@ -7,6 +7,10 @@ return {
         view = { width = 35 },
         update_focused_file = { enable = true, update_root = true },
         respect_buf_cwd = true,
+        filters = {
+          dotfiles = false,
+          git_ignored = false,
+        },
       })
     end,
   },

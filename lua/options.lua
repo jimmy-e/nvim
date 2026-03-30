@@ -35,7 +35,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 -- Auto-save after pause in typing (VSCode-style)
 vim.opt.updatetime = 1000  -- Save after 1 second of inactivity (adjust as needed)
 
-vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+vim.api.nvim_create_autocmd({ "InsertLeave", "CursorHold", "CursorHoldI" }, {
   pattern = "*",
   callback = function()
     -- Check if auto-save is enabled (can be toggled with <Space>ta)

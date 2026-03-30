@@ -15,7 +15,7 @@ return {
       
       -- Auto-install language servers on first launch
       local mason_registry = require("mason-registry")
-      local servers = { "pyright", "typescript-language-server", "lua-language-server", "yaml-language-server" }
+      local servers = { "pyright", "typescript-language-server", "lua-language-server", "yaml-language-server", "debugpy" }
       
       for _, server in ipairs(servers) do
         if not mason_registry.is_installed(server) then

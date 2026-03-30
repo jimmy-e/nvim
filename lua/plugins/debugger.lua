@@ -45,7 +45,9 @@ return {
         return "python3"
       end
 
-      require("dap-python").setup(python_path())
+      -- Use Mason's debugpy so it doesn't need to be in every project venv
+      local debugpy_path = vim.fn.stdpath("data") .. "/mason/packages/debugpy/venv/bin/python"
+      require("dap-python").setup(debugpy_path)
 
       -- ------------------------------------------------------------
       -- FastAPI / Uvicorn launch (VS Code equivalent)
@@ -56,6 +58,21 @@ return {
       -- args: ["app:fast_app", "--reload"]
       -- ------------------------------------------------------------
       dap.configurations.python = dap.configurations.python or {}
+
+      table.insert(dap.configurations.python, {
+        type = "python",
+        request = "launch",
+        name = "Debug: Current File",
+        program = "${file}",
+        console = "integratedTerminal",
+        cwd = "${workspaceFolder}",
+        env = {
+          PYTHONPATH = "${workspaceFolder}",
+          LOG_LEVEL = "INFO",
+          PYTHONUNBUFFERED = "1",
+        },
+        justMyCode = false,
+      })
 
       table.insert(dap.configurations.python, {
         type = "python",

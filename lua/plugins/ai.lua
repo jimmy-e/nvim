@@ -12,9 +12,13 @@ return {
       require("claudecode").setup({
         terminal_cmd = "/opt/homebrew/bin/claude --model claude-opus-4-6",
         terminal = {
-          split_side = "right",
-          split_width_percentage = 0.30,
           provider = "snacks",
+          snacks_win_opts = {
+            position = "float",
+            width = 0.85,
+            height = 0.8,
+            border = "rounded",
+          },
         },
       })
     end,

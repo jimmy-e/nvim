@@ -45,11 +45,15 @@ end, { silent = true, desc = "Buffers" })
 vim.keymap.set("n", "<leader>gs", ":Neogit<CR>", { silent = true, desc = "Neogit Status" })
 
 ---------------------------------------------------------------
--- Terminal
+-- Terminal (floating, persistent session)
 ---------------------------------------------------------------
-vim.keymap.set("n", "<leader>t", function()
-  vim.cmd("botright 12split | terminal")
-end, { desc = "Terminal (Bottom Split)" })
+vim.keymap.set("n", "<leader>\\", function()
+  require("floating_terminal").toggle()
+end, { desc = "Toggle Floating Terminal" })
+
+vim.keymap.set("t", "<leader>\\", function()
+  require("floating_terminal").toggle()
+end, { desc = "Toggle Floating Terminal" })
 
 ---------------------------------------------------------------
 -- Window navigation (not motions)
@@ -122,15 +126,8 @@ end, { desc = "Cheat Sheet" })
 vim.keymap.set(
   "n",
   "<leader>mp",
-  "<cmd>MarkdownPreviewToggle<CR>",
-  { desc = "Markdown Preview Toggle", silent = true }
-)
-
-vim.keymap.set(
-  "n",
-  "<leader>ms",
-  "<cmd>MarkdownPreviewStop<CR>",
-  { desc = "Markdown Preview Stop", silent = true }
+  function() require("markdown_preview").open() end,
+  { desc = "Markdown Preview Popup", silent = true }
 )
 
 vim.keymap.set(
@@ -152,7 +149,51 @@ vim.keymap.set("n", "<leader>z", "<cmd>ZenMode<CR>", { desc = "Focus mode (Zen)"
 ---------------------------------------------------------------
 -- Claude Code AI
 ---------------------------------------------------------------
-vim.keymap.set("n", "<leader>at", "<cmd>ClaudeCode<CR>", { desc = "Claude: Toggle panel" })
+local claude_session_started = false
+
+-- Toggle Claude — shows session picker only on first open per Neovim session
+vim.keymap.set("n", "<leader>at", function()
+  if claude_session_started then
+    -- Already launched this session, just toggle
+    vim.cmd("ClaudeCode")
+    return
+  end
+
+  -- First time opening — ask how to start
+  vim.ui.select(
+    { "New session", "Continue last session", "Pick session" },
+    { prompt = "Claude Code:" },
+    function(choice)
+      if not choice then return end
+      claude_session_started = true
+      if choice == "New session" then
+        vim.cmd("ClaudeCode")
+      elseif choice == "Continue last session" then
+        vim.cmd("ClaudeCode --continue")
+      elseif choice == "Pick session" then
+        vim.cmd("ClaudeCode --resume")
+      end
+    end
+  )
+end, { desc = "Claude: Toggle/session picker" })
+
+-- Switch to a new session or pick a different one mid-session
+vim.keymap.set("n", "<leader>as", function()
+  claude_session_started = false
+  -- Close current if open
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if vim.api.nvim_win_get_config(win).relative ~= "" then
+      local buf = vim.api.nvim_win_get_buf(win)
+      if vim.api.nvim_buf_get_name(buf):match("claude") then
+        vim.cmd("ClaudeCode")
+        break
+      end
+    end
+  end
+  -- Show picker for next open
+  vim.notify("Claude session reset — next <leader>at will show session picker", vim.log.levels.INFO)
+end, { desc = "Claude: Switch session" })
+
 vim.keymap.set("n", "<leader>af", "<cmd>ClaudeCodeFocus<CR>", { desc = "Claude: Focus panel" })
 vim.keymap.set("v", "<leader>aa", "<cmd>ClaudeCodeSend<CR>", { desc = "Claude: Send selection" })
 vim.keymap.set("n", "<leader>am", "<cmd>ClaudeCodeSelectModel<CR>", { desc = "Claude: Select model" })

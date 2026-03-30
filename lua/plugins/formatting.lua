@@ -13,6 +13,12 @@ return {
           yaml = { "prettier" },
           markdown = { "prettier" },
         },
+        formatters = {
+          black = {
+            -- Bypass pyenv shim to avoid timeout
+            command = vim.fn.expand("~/.pyenv/versions/3.13.3/bin/black"),
+          },
+        },
       })
 
       vim.api.nvim_create_autocmd("BufWritePre", {
@@ -20,6 +26,7 @@ return {
           conform.format({
             bufnr = args.buf,
             lsp_fallback = true,
+            timeout_ms = 5000,
           })
         end,
       })

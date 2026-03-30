@@ -159,20 +159,26 @@ return {
 
             hl["@function"] = { fg = c.cyan, bold = true }
             hl["@function.call"] = { fg = c.cyan }
-            hl["@method"] = { fg = c.cyan, bold = true }
-            hl["@method.call"] = { fg = c.cyan }
+            hl["@function.method"] = { fg = c.cyan, bold = true }       -- 0.10+ (was @method)
+            hl["@function.method.call"] = { fg = c.cyan }               -- 0.10+ (was @method.call)
+            hl["@function.builtin"] = { fg = c.teal, bold = true }      -- print, len, range, etc.
             hl["@constructor"] = { fg = c.teal, bold = true }
 
             hl["@type"] = { fg = c.teal, bold = true }
             hl["@type.builtin"] = { fg = c.teal, bold = true }
             hl["@type.definition"] = { fg = c.teal, bold = true }
 
-            hl["@variable"] = { fg = c.blue }
-            hl["@variable.builtin"] = { fg = c.red1 }
-            hl["@parameter"] = { fg = c.yellow }
-            hl["@field"] = { fg = c.magenta }
+            hl["@module"] = { fg = c.blue }                             -- module/namespace names
+            hl["@module.builtin"] = { fg = c.teal }                     -- builtins like __builtins__
+
+            hl["@variable"] = { fg = c.blue1 }
+            hl["@variable.builtin"] = { fg = c.red1 }                   -- self, cls, super
+            hl["@variable.parameter"] = { fg = c.yellow }               -- 0.10+ (was @parameter)
+            hl["@variable.parameter.builtin"] = { fg = c.orange }       -- *args, **kwargs
+            hl["@variable.member"] = { fg = c.magenta }                 -- 0.10+ (was @field/@property)
             hl["@property"] = { fg = c.magenta }
             hl["@attribute"] = { fg = c.yellow }
+            hl["@attribute.builtin"] = { fg = c.orange, italic = true } -- __dunder__ attributes
 
             hl["@constant"] = { fg = c.magenta, bold = true }
             hl["@constant.builtin"] = { fg = c.magenta, bold = true }
@@ -191,21 +197,31 @@ return {
             hl["@type.qualifier"] = { fg = c.purple, italic = true }
             hl["@keyword.import"] = { fg = c.yellow, italic = true }
 
-            -- LSP semantic tokens
-            hl["@lsp.type.variable"] = { fg = c.blue }
+            -- LSP semantic tokens (pyright + general)
+            hl["@lsp.type.variable"] = { fg = c.blue1 }
             hl["@lsp.type.parameter"] = { fg = c.yellow }
             hl["@lsp.type.function"] = { fg = c.cyan, bold = true }
             hl["@lsp.type.method"] = { fg = c.cyan, bold = true }
             hl["@lsp.type.property"] = { fg = c.magenta }
             hl["@lsp.type.type"] = { fg = c.teal, bold = true }
             hl["@lsp.type.class"] = { fg = c.teal, bold = true }
-            hl["@lsp.type.namespace"] = { fg = c.teal }
+            hl["@lsp.type.namespace"] = { fg = c.blue }
+            hl["@lsp.type.module"] = { fg = c.blue }
             hl["@lsp.type.enum"] = { fg = c.teal }
             hl["@lsp.type.enumMember"] = { fg = c.magenta }
             hl["@lsp.type.keyword"] = { fg = c.purple, italic = true }
             hl["@lsp.type.operator"] = { fg = c.red }
             hl["@lsp.type.string"] = { fg = c.green }
             hl["@lsp.type.number"] = { fg = c.orange }
+            hl["@lsp.type.decorator"] = { fg = c.yellow, italic = true }
+            hl["@lsp.type.selfParameter"] = { fg = c.red1 }
+            hl["@lsp.type.clsParameter"] = { fg = c.red1 }
+            -- Pyright modifier combos — these override plain @lsp.type.* for special cases
+            hl["@lsp.typemod.variable.readonly"] = { fg = c.magenta, bold = true }      -- constants
+            hl["@lsp.typemod.variable.defaultLibrary"] = { fg = c.teal }                -- builtins
+            hl["@lsp.typemod.function.builtin"] = { fg = c.teal, bold = true }
+            hl["@lsp.typemod.class.defaultLibrary"] = { fg = c.teal, bold = true }
+            hl["@lsp.typemod.variable.typeHint"] = { fg = c.teal }                      -- type annotation vars
 
             -- Make TODO/FIXME stand out
             hl.Todo = { fg = c.bg, bg = c.yellow, bold = true }

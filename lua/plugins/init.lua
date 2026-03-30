@@ -28,6 +28,7 @@ extend(require("plugins.navigation"))
 extend(require("plugins.git.plugins"))
 extend(require("plugins.treesitter"))
 extend(require("plugins.mason"))
+extend(require("plugins.lsp"))
 extend(require("plugins.completion"))
 extend(require("plugins.formatting"))
 extend(require("plugins.ai"))
@@ -38,6 +39,8 @@ extend(require("plugins.markdown"))
 extend(require("plugins.zen"))
 extend(require("plugins.harpoon"))
 extend(require("plugins.undotree"))
+extend(require("plugins.testing"))
+extend(require("plugins.popnav"))
 
 -----------------------------------------------------------
 -- Setup lazy.nvim
