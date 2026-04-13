@@ -12,6 +12,19 @@ return {
           git_ignored = false,
         },
       })
+
+      -- Open nvim-tree automatically on startup
+      vim.api.nvim_create_autocmd("VimEnter", {
+        callback = function(data)
+          local real_file = vim.fn.filereadable(data.file) == 1
+          local no_name = data.file == "" and vim.bo[data.buf].buftype == ""
+          if not real_file and not no_name then
+            return
+          end
+          -- Open tree without stealing focus; find the file if one was given
+          require("nvim-tree.api").tree.toggle({ focus = false, find_file = true })
+        end,
+      })
     end,
   },
 
