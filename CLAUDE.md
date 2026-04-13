@@ -89,7 +89,7 @@ nvim-tree opens automatically on `VimEnter` via an autocmd in `lua/plugins/navig
 
 Toggle manually with `<leader>e` or `Cmd+1`.
 
-**iTerm2 Cmd+1 setup:** iTerm2 intercepts `Cmd+1` natively, so it must be remapped to forward to neovim. In iTerm2 → Settings → Profiles → Keys → Key Mappings → `+`: set shortcut `Cmd+1`, action `Send Escape Sequence`, value `[57P`. Neovim then binds `\x1b[57P` to `:NvimTreeToggle`.
+**iTerm2 Cmd+1 setup:** iTerm2 intercepts `Cmd+1` natively, so it must be remapped to forward to neovim. In iTerm2 → Settings → Profiles → Keys → Key Mappings → `+`: set shortcut `Cmd+1`, action `Send Escape Sequence`, value `[57P`. Neovim receives `\x1b[57P` and translates it internally to `<F1>`, so the neovim keymap binds `<F1>` to `:NvimTreeToggle`.
 
 ## Notes & Decisions
 

@@ -5,7 +5,7 @@ return {
     config = function()
       require("nvim-tree").setup({
         view = { width = 35 },
-        update_focused_file = { enable = true, update_root = true },
+        update_focused_file = { enable = true, update_root = false },
         respect_buf_cwd = true,
         filters = {
           dotfiles = false,

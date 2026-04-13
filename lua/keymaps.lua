@@ -23,8 +23,8 @@ end, { desc = "Toggle auto-save" })
 -- File tree
 ---------------------------------------------------------------
 vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { silent = true, desc = "File Tree" })
--- iTerm2: Cmd+1 is mapped to "Send Escape Sequence" → [57P in iTerm2 key mappings
-vim.keymap.set("n", "\x1b[57P", ":NvimTreeToggle<CR>", { silent = true, noremap = true, desc = "File Tree (Cmd+1)" })
+-- iTerm2 Cmd+1 sends \x1b[57P, which neovim translates to <F1>
+vim.keymap.set("n", "<F1>", ":NvimTreeToggle<CR>", { silent = true, noremap = true, desc = "File Tree (Cmd+1)" })
 
 ---------------------------------------------------------------
 -- Telescope
