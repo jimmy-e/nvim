@@ -46,6 +46,29 @@ Options: `tokyonight-night`, `tokyonight-storm`, `tokyonight-moon`, `tokyonight-
 
 Treesitter capture groups and LSP semantic tokens are all custom-colored in `ui.lua`'s `on_highlights` callback.
 
+## Motion Layout
+
+Custom IJKL-style layout (replaces default hjkl):
+
+| Key | Action |
+|---|---|
+| `i` | Up |
+| `k` | Down |
+| `j` | Left |
+| `l` | Right (unchanged) |
+| `h` | Enter insert mode |
+
+Operator-pending mode is **untouched** — `ciw`, `di"`, `yip`, etc. still use `i` as "inner".
+
+Window navigation (`Ctrl+` combos) mirrors the motion layout:
+
+| Key | Action |
+|---|---|
+| `<C-h>` | Window up (`<C-i>` unavailable — same escape code as Tab) |
+| `<C-j>` | Window left |
+| `<C-k>` | Window down |
+| `<C-l>` | Window right |
+
 ## Key Keymaps (leader = `<Space>`)
 
 | Keymap | Action |
@@ -98,3 +121,4 @@ Toggle manually with `<leader>e` or `Cmd+1`.
 - **Clipboard** is synced with system clipboard (`unnamedplus`).
 - Invisible characters are shown (`tab`, `trail`, `nbsp`).
 - Claude Code sessions: first `<leader>at` shows a picker (new/continue/resume); subsequent toggles skip the picker until `<leader>as` resets it.
+- **Motion remapping** uses `vim.cmd("nnoremap ...")` rather than `vim.keymap.set` — both `vim.keymap.set` and `vim.api.nvim_set_keymap` fail for single-character key remaps on Neovim 0.12.1.

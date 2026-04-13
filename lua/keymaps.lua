@@ -1,6 +1,20 @@
 -- ============================================================
--- Safe “command” keymaps only (no Vim motion overrides)
+-- Keymaps
 -- ============================================================
+
+---------------------------------------------------------------
+-- Custom motion layout: i=up, k=down, j=left, l=right, h=insert
+---------------------------------------------------------------
+-- Normal mode
+vim.cmd("nnoremap i k")
+vim.cmd("nnoremap k j")
+vim.cmd("nnoremap j h")
+vim.cmd("nnoremap h i")
+
+-- Visual mode (operator-pending mode untouched: ciw, di", etc. still work)
+vim.cmd("xnoremap i k")
+vim.cmd("xnoremap k j")
+vim.cmd("xnoremap j h")
 
 ---------------------------------------------------------------
 -- Core file / editor commands
@@ -60,9 +74,9 @@ end, { desc = "Toggle Floating Terminal" })
 ---------------------------------------------------------------
 -- Window navigation (not motions)
 ---------------------------------------------------------------
-vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Window Left" })
-vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Window Down" })
-vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Window Up" })
+vim.keymap.set("n", "<C-h>", "<C-w>k", { desc = "Window Up" })
+vim.keymap.set("n", "<C-j>", "<C-w>h", { desc = "Window Left" })
+vim.keymap.set("n", "<C-k>", "<C-w>j", { desc = "Window Down" })
 vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Window Right" })
 
 ---------------------------------------------------------------
