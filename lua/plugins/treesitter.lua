@@ -4,90 +4,47 @@ return {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     lazy = false,
-    priority = 50,
     config = function()
-      local ok, configs = pcall(require, "nvim-treesitter.configs")
-      if not ok then
-        vim.notify("⚠️ nvim-treesitter not available. Run :Lazy sync", vim.log.levels.WARN)
-        return
-      end
-
-      -- Make sure Neovim baseline highlighting/filetype systems are on
-      vim.cmd("filetype plugin indent on")
-      vim.cmd("syntax enable")
-
-      configs.setup({
-        ensure_installed = {
-          "python",
-          "lua",
-          "vim",
-          "vimdoc",
-          "json",
-          "jsonc",
-          "markdown",
-          "markdown_inline",
-          "bash",
-          "typescript",
-          "tsx",
-          "javascript",
-          "html",
-          "css",
-          "yaml",
-          "toml",
-          "sql",
-          "dockerfile",
-          "regex",
-          "comment",
-        },
-
-        sync_install = false,
-        auto_install = true,
-
-        highlight = {
-          enable = true,
-          additional_vim_regex_highlighting = false,
-        },
-
-        indent = {
-          enable = true,
-        },
-
-        incremental_selection = {
-          enable = true,
-          keymaps = {
-            init_selection = "<CR>",
-            node_incremental = "<CR>",
-            scope_incremental = "<Tab>",
-            node_decremental = "<S-Tab>",
-          },
-        },
+      -- Install parsers (no-op if already installed)
+      require("nvim-treesitter").install({
+        "python",
+        "lua",
+        "vim",
+        "vimdoc",
+        "json",
+        "markdown",
+        "markdown_inline",
+        "bash",
+        "typescript",
+        "tsx",
+        "javascript",
+        "html",
+        "css",
+        "yaml",
+        "toml",
+        "sql",
+        "dockerfile",
+        "regex",
+        "comment",
       })
 
-      -- Force-start Tree-sitter highlighter on buffer filetype.
-      -- This helps when startup order/autocmds prevent TS from attaching.
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "python", "lua", "vim", "vimdoc", "json", "jsonc", "markdown", "bash", "javascript", "javascriptreact", "typescript", "typescriptreact", "yaml", "toml", "css", "html", "sql" },
-        callback = function(args)
-          -- Prefer native API (Neovim 0.10+)
-          local ok = pcall(vim.treesitter.start, args.buf)
-          if not ok then
-            -- Fallback: explicitly pass the filetype as the language
-            pcall(vim.treesitter.start, args.buf, vim.bo[args.buf].filetype)
-          end
+      -- Enable treesitter highlighting for all filetypes (silently skip unsupported ones)
+      vim.api.nvim_create_autocmd("BufReadPost", {
+        pattern = "*",
+        callback = function()
+          pcall(vim.treesitter.start)
         end,
       })
 
-      -- Quick diagnostic command (avoids older `has_parser` helpers)
+      -- Quick diagnostic command
       vim.api.nvim_create_user_command("TSStatus", function()
         local bufnr = vim.api.nvim_get_current_buf()
         local ft = vim.bo[bufnr].filetype
-
         local parser_ok = pcall(vim.treesitter.get_parser, bufnr, ft)
         local highlighter_ok = false
         if vim.treesitter.highlighter and vim.treesitter.highlighter.active then
           highlighter_ok = vim.treesitter.highlighter.active[bufnr] ~= nil
         end
-
         vim.notify(
           string.format("TSStatus: ft=%s | parser=%s | highlighter=%s", ft, parser_ok and "ok" or "no", tostring(highlighter_ok)),
           vim.log.levels.INFO
