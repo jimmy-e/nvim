@@ -43,9 +43,38 @@ vim.keymap.set("n", "<F1>", ":NvimTreeToggle<CR>", { silent = true, noremap = tr
 ---------------------------------------------------------------
 -- Telescope
 ---------------------------------------------------------------
-vim.keymap.set("n", "<leader>ff", function()
-  require("telescope.builtin").find_files()
-end, { silent = true, desc = "Find Files" })
+local function smart_find_files()
+  local builtin = require("telescope.builtin")
+  local action_state = require("telescope.actions.state")
+  local actions = require("telescope.actions")
+
+  local function open_picker(opts)
+    builtin.find_files(vim.tbl_extend("force", {
+      attach_mappings = function(prompt_bufnr, map)
+        map("i", "/", function()
+          vim.api.nvim_feedkeys("/", "n", false)
+          vim.schedule(function()
+            if not vim.api.nvim_buf_is_valid(prompt_bufnr) then return end
+            local prompt = action_state.get_current_picker(prompt_bufnr):_get_prompt()
+            if prompt:sub(-1) == "/" then
+              actions.close(prompt_bufnr)
+              builtin.find_files({
+                default_text = prompt,
+                find_command = { "fd", "--type", "d", "--hidden", "--exclude", ".git" },
+              })
+            end
+          end)
+        end)
+        return true
+      end,
+    }, opts or {}))
+  end
+
+  open_picker()
+end
+
+vim.keymap.set("n", "<leader>ff", smart_find_files, { silent = true, desc = "Find Files" })
+vim.keymap.set("n", "<F2>", smart_find_files, { silent = true, desc = "Find Files (Cmd+Shift+O)" })
 
 vim.keymap.set("n", "<leader>fg", function()
   require("telescope.builtin").live_grep()
