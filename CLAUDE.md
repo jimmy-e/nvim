@@ -242,6 +242,12 @@ Custom IJKL-style layout (replaces default hjkl). Implemented with `vim.cmd("nno
 | `<leader>fg` | Live grep (Telescope) |
 | `<leader>fb` | Buffers (Telescope) |
 
+**nvim-tree buffer keymaps (local to tree):**
+| Keymap | Action |
+|---|---|
+| `l` / `<Right>` | Open folder / file |
+| `j` / `<Left>` | Close directory (collapse) |
+
 ### Git (gitsigns — buffer-local)
 | Keymap | Action |
 |---|---|
@@ -372,6 +378,8 @@ Diagnostic command: `:TSStatus` — reports filetype, parser status, and highlig
 ## File Tree (nvim-tree)
 
 nvim-tree auto-opens on `VimEnter` via autocmd. Opens without stealing focus (`focus = false`), highlights current file (`find_file = true`). Skips special buffers (diffs, fugitive, etc.).
+
+**Custom keymaps** (set via `on_attach`, local to the tree buffer): `l` / `<Right>` opens a folder or file; `j` / `<Left>` closes the current directory. These override the global IJKL motion remaps inside the tree only.
 
 **iTerm2 Cmd+1 setup:** iTerm2 intercepts `Cmd+1` natively — remap in iTerm2 → Settings → Profiles → Keys → `+`: shortcut `Cmd+1`, action `Send Escape Sequence`, value `[57P`. Neovim receives `\x1b[57P`, translates to `<F1>`, keymap binds `<F1>` to `:NvimTreeToggle`.
 
