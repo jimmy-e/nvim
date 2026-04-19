@@ -1,6 +1,6 @@
 -- ============================================================
 -- UI / Themes
--- Toggle between TokyoNight and Nightfox easily
+-- Toggle between TokyoNight, Nightfox, Monokai Pro, and Ayu
 -- ============================================================
 
 -- Change this value to switch themes quickly:
@@ -13,7 +13,18 @@
 --   "nightfox"
 --   "duskfox"
 --   "carbonfox"
-local ACTIVE_THEME = "carbonfox"
+-- Monokai Pro:
+--   "monokai-pro"           (Pro filter — default)
+--   "monokai-pro-octagon"
+--   "monokai-pro-machine"
+--   "monokai-pro-ristretto"
+--   "monokai-pro-spectrum"
+--   "monokai-pro-classic"
+-- Ayu:
+--   "ayu-dark"
+--   "ayu-mirage"
+--   "ayu-light"
+local ACTIVE_THEME = "monokai-pro-spectrum"
 
 local function starts_with(str, prefix)
   return str:sub(1, #prefix) == prefix
@@ -26,6 +37,13 @@ local function tokyonight_style_from_theme(theme)
     return style
   end
   return "night"
+end
+
+local function monokai_filter_from_theme(theme)
+  -- "monokai-pro" → "pro", "monokai-pro-octagon" → "octagon"
+  local filter = theme:gsub("^monokai%-pro%-?", "")
+  if filter == "" then filter = "pro" end
+  return filter
 end
 
 return {
@@ -43,6 +61,24 @@ return {
   ------------------------------------------------------------------
   {
     "EdenEast/nightfox.nvim",
+    lazy = false,
+    priority = 1000,
+  },
+
+  ------------------------------------------------------------------
+  -- Monokai Pro
+  ------------------------------------------------------------------
+  {
+    "loctvl842/monokai-pro.nvim",
+    lazy = false,
+    priority = 1000,
+  },
+
+  ------------------------------------------------------------------
+  -- Ayu
+  ------------------------------------------------------------------
+  {
+    "shatur/neovim-ayu",
     lazy = false,
     priority = 1000,
   },
@@ -235,6 +271,33 @@ return {
         })
       end
 
+      -- If using Ayu, configure it BEFORE colorscheme is applied
+      if starts_with(ACTIVE_THEME, "ayu") then
+        require("ayu").setup({
+          mirage = ACTIVE_THEME == "ayu-mirage",
+          terminal = true,
+        })
+      end
+
+      -- If using Monokai Pro, configure it BEFORE colorscheme is applied
+      if starts_with(ACTIVE_THEME, "monokai-pro") then
+        local filter = monokai_filter_from_theme(ACTIVE_THEME)
+        require("monokai-pro").setup({
+          filter = filter,
+          transparent_background = false,
+          terminal_colors = true,
+          devicons = true,
+          styles = {
+            comment = { italic = true },
+            keyword = { italic = true },
+            type = { italic = true },
+            parameter = { italic = true },
+          },
+          inc_search = "background",
+          background_clear = { "telescope" },
+        })
+      end
+
       -- Apply the selected scheme
       vim.cmd.colorscheme(ACTIVE_THEME)
     end,
@@ -247,9 +310,15 @@ return {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
+      local lualine_theme = ACTIVE_THEME
+      if starts_with(ACTIVE_THEME, "monokai-pro") then
+        lualine_theme = "monokai-pro"
+      elseif starts_with(ACTIVE_THEME, "ayu") then
+        lualine_theme = "ayu"
+      end
       require("lualine").setup({
         options = {
-          theme = ACTIVE_THEME,
+          theme = lualine_theme,
           section_separators = "",
           component_separators = "",
         },
