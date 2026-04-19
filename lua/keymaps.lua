@@ -59,8 +59,26 @@ local function smart_find_files()
             if prompt:sub(-1) == "/" then
               actions.close(prompt_bufnr)
               builtin.find_files({
-                default_text = prompt,
+                default_text = prompt:sub(1, -2),
                 find_command = { "fd", "--type", "d", "--hidden", "--exclude", ".git" },
+                attach_mappings = function(dir_bufnr, dir_map)
+                  local telescope_actions = require("telescope.actions")
+                  local function select_dir()
+                    local selection = action_state.get_selected_entry()
+                    telescope_actions.close(dir_bufnr)
+                    if not selection then return end
+                    local dir_path = vim.fn.getcwd() .. "/" .. selection.value
+                    local tree = require("nvim-tree.api")
+                    tree.tree.open({ focus = true })
+                    vim.schedule(function()
+                      tree.tree.find_file({ buf = dir_path, open = true, focus = true })
+                      vim.schedule(function() tree.node.open.edit() end)
+                    end)
+                  end
+                  dir_map("i", "<CR>", select_dir)
+                  dir_map("n", "<CR>", select_dir)
+                  return true
+                end,
               })
             end
           end)

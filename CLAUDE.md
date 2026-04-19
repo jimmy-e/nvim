@@ -385,7 +385,7 @@ nvim-tree auto-opens on `VimEnter` via autocmd. Opens without stealing focus (`f
 
 **iTerm2 Cmd+Shift+O setup:** Same approach — shortcut `Cmd+Shift+O`, action `Send Escape Sequence`, value `[57Q`. Neovim receives `\x1b[57Q`, translates to `<F2>`, keymap binds `<F2>` to smart file finder.
 
-**Smart file finder** (`<leader>ff` / `<F2>` / Cmd+Shift+O): Fuzzy searches all project files. Typing a query ending with `/` switches to directory-only results (uses `fd --type d`). Implemented as a custom `attach_mappings` wrapper around `telescope.builtin.find_files` in `lua/keymaps.lua`.
+**Smart file finder** (`<leader>ff` / `<F2>` / Cmd+Shift+O): Fuzzy searches all project files. Typing a query ending with `/` switches to directory-only results (uses `fd --type d`). Pressing `<CR>` on a directory opens nvim-tree, navigates to that folder, expands it, and places the cursor on it. Implemented as a custom `attach_mappings` wrapper around `telescope.builtin.find_files` in `lua/keymaps.lua`.
 
 ---
 
