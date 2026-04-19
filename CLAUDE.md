@@ -240,6 +240,7 @@ Custom IJKL-style layout (replaces default hjkl). Implemented with `vim.cmd("nno
 | `<F1>` / `Cmd+1` | Toggle focus: tree ↔ editor |
 | `<F2>` / `Cmd+Shift+1` | Toggle nvim-tree show/hide |
 | `<F3>` / `Cmd+Shift+O` | Find files (Telescope, smart) |
+| `<F4>` / `Cmd+T` | Toggle floating terminal |
 | `<leader>fg` | Live grep (Telescope) |
 | `<leader>fb` | Buffers (Telescope) |
 
@@ -387,6 +388,10 @@ nvim-tree auto-opens on `VimEnter` via autocmd. Opens without stealing focus (`f
 **iTerm2 Cmd+Shift+1 setup:** Same approach — shortcut `Cmd+Shift+1`, action `Send Escape Sequence`, value `[57Q`. Neovim receives `\x1b[57Q`, translates to `<F2>`, keymap toggles nvim-tree show/hide.
 
 **iTerm2 Cmd+Shift+O setup:** Same approach — shortcut `Cmd+Shift+O`, action `Send Escape Sequence`, value `[57R`. Neovim receives `\x1b[57R`, translates to `<F3>`, keymap opens smart file finder.
+
+**iTerm2 Cmd+T setup:** Same approach — shortcut `Cmd+T`, action `Send Escape Sequence`, value `[57S`. Neovim receives `\x1b[57S`, translates to `<F4>`, keymap toggles floating terminal (works in both normal and terminal modes).
+
+**iTerm2 Cmd+Shift+T setup:** Opens a new iTerm2 tab (configured in iTerm2 → Settings → Profiles → Keys → General: "Cmd+Shift+T" → New Tab).
 
 **Smart file finder** (`<leader>ff` / `<F3>` / Cmd+Shift+O): Fuzzy searches all project files. Typing a query ending with `/` switches to directory-only results (uses `fd --type d`). Pressing `<CR>` on a directory opens nvim-tree, navigates to that folder, expands it, and places the cursor on it. Implemented as a custom `attach_mappings` wrapper around `telescope.builtin.find_files` in `lua/keymaps.lua`.
 

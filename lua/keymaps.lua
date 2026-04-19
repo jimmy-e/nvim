@@ -50,6 +50,14 @@ end, { silent = true, noremap = true, desc = "File Tree (Cmd+1)" })
 -- iTerm2 Cmd+Shift+O sends \x1b[57Q, which translates to <F2>
 -- Toggle tree show/hide
 vim.keymap.set("n", "<F2>", ":NvimTreeToggle<CR>", { silent = true, desc = "Toggle Tree (Cmd+Shift+1)" })
+-- iTerm2 Cmd+T sends \x1b[57S, which translates to <F4>
+-- Toggle floating terminal
+vim.keymap.set("n", "<F4>", function()
+  require("floating_terminal").toggle()
+end, { silent = true, noremap = true, desc = "Terminal (Cmd+T)" })
+vim.keymap.set("t", "<F4>", function()
+  require("floating_terminal").toggle()
+end, { silent = true, noremap = true, desc = "Terminal (Cmd+T)" })
 
 ---------------------------------------------------------------
 -- Telescope
