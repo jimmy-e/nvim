@@ -24,8 +24,58 @@ return {
         filters = {
           dotfiles = false,
           git_ignored = false,
+          custom = {
+            "^\\.claude$",
+            "^\\.aws-sam$",
+            "^\\.git$",
+            "^\\.github$",
+            "^\\.idea$",
+            "^\\.mypy_cache$",
+            "^\\.pytest_cache$",
+            "^\\.venv$",
+            "^__pycache__$",
+          },
         },
+        renderer = {
+          highlight_git = true,
+          highlight_opened_files = "name",
+          icons = {
+            show = { folder_arrow = false },
+            glyphs = {
+              git = {
+                unstaged  = "~",
+                staged    = "+",
+                unmerged  = "!",
+                renamed   = "»",
+                untracked = "?",
+                deleted   = "-",
+                ignored   = " ",
+              },
+            },
+          },
+        },
+        git = { enable = true, ignore = false, show_on_dirs = false },
       })
+
+      -- Folder icon colors
+      vim.api.nvim_set_hl(0, "NvimTreeFolderIcon",        { fg = "#F0C060" })
+      vim.api.nvim_set_hl(0, "NvimTreeOpenedFolderIcon",  { fg = "#F0C060" })
+      vim.api.nvim_set_hl(0, "NvimTreeFolderName",        { fg = "#8BAFD1" })
+      vim.api.nvim_set_hl(0, "NvimTreeOpenedFolderName",  { fg = "#C0D8F0", bold = true })
+      vim.api.nvim_set_hl(0, "NvimTreeEmptyFolderName",   { fg = "#6A8FAD" })
+
+      -- Make all .env* files use the same lock icon as .env
+      local ok, devicons = pcall(require, "nvim-web-devicons")
+      if ok then
+        local orig_get_icon = devicons.get_icon
+        devicons.get_icon = function(name, ext, opts)
+          if type(name) == "string" and name ~= ".env" and name:match("^%.env") then
+            local icon, hl = orig_get_icon(".env", nil, opts)
+            if icon then return icon, hl end
+          end
+          return orig_get_icon(name, ext, opts)
+        end
+      end
 
       -- Open nvim-tree automatically on startup
       vim.api.nvim_create_autocmd("VimEnter", {
