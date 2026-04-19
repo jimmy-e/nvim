@@ -13,7 +13,7 @@
 --   "nightfox"
 --   "duskfox"
 --   "carbonfox"
-local ACTIVE_THEME = "tokyonight-night"
+local ACTIVE_THEME = "carbonfox"
 
 local function starts_with(str, prefix)
   return str:sub(1, #prefix) == prefix
