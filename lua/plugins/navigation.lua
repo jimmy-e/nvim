@@ -39,9 +39,20 @@ return {
         renderer = {
           highlight_git = true,
           highlight_opened_files = "name",
+          indent_markers = { enable = true },
           icons = {
-            show = { folder_arrow = false },
+            show = { folder_arrow = true },
             glyphs = {
+              folder = {
+                arrow_closed = "▸",
+                arrow_open = "▾",
+                default = "󰉋",
+                open = "󰝰",
+                empty = "󰉌",
+                empty_open = "󰅪",
+                symlink = "󰉫",
+                symlink_open = "󰉬",
+              },
               git = {
                 unstaged  = "~",
                 staged    = "+",
@@ -63,6 +74,9 @@ return {
       vim.api.nvim_set_hl(0, "NvimTreeFolderName",        { fg = "#8BAFD1" })
       vim.api.nvim_set_hl(0, "NvimTreeOpenedFolderName",  { fg = "#C0D8F0", bold = true })
       vim.api.nvim_set_hl(0, "NvimTreeEmptyFolderName",   { fg = "#6A8FAD" })
+      vim.api.nvim_set_hl(0, "NvimTreeFolderSymlinkIcon", { fg = "#C792EA" })
+      vim.api.nvim_set_hl(0, "NvimTreeArrowOpen",         { fg = "#89DDFF" })
+      vim.api.nvim_set_hl(0, "NvimTreeArrowClosed",       { fg = "#89DDFF" })
 
       -- Make all .env* files use the same lock icon as .env
       local ok, devicons = pcall(require, "nvim-web-devicons")
