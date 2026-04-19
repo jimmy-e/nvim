@@ -47,6 +47,9 @@ vim.keymap.set("n", "<F1>", function()
     api.tree.open()
   end
 end, { silent = true, noremap = true, desc = "File Tree (Cmd+1)" })
+-- iTerm2 Cmd+Shift+O sends \x1b[57Q, which translates to <F2>
+-- Toggle tree show/hide
+vim.keymap.set("n", "<F2>", ":NvimTreeToggle<CR>", { silent = true, desc = "Toggle Tree (Cmd+Shift+1)" })
 
 ---------------------------------------------------------------
 -- Telescope
@@ -100,7 +103,7 @@ local function smart_find_files()
 end
 
 vim.keymap.set("n", "<leader>ff", smart_find_files, { silent = true, desc = "Find Files" })
-vim.keymap.set("n", "<F2>", smart_find_files, { silent = true, desc = "Find Files (Cmd+Shift+O)" })
+vim.keymap.set("n", "<F3>", smart_find_files, { silent = true, desc = "Find Files (Cmd+Shift+O)" })
 
 vim.keymap.set("n", "<leader>fg", function()
   require("telescope.builtin").live_grep()
