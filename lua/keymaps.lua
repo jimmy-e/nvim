@@ -38,7 +38,15 @@ end, { desc = "Toggle auto-save" })
 ---------------------------------------------------------------
 vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { silent = true, desc = "File Tree" })
 -- iTerm2 Cmd+1 sends \x1b[57P, which neovim translates to <F1>
-vim.keymap.set("n", "<F1>", ":NvimTreeToggle<CR>", { silent = true, noremap = true, desc = "File Tree (Cmd+1)" })
+-- Toggle focus: tree ↔ editor
+vim.keymap.set("n", "<F1>", function()
+  local api = require("nvim-tree.api")
+  if api.tree.is_visible() then
+    vim.cmd("wincmd p")
+  else
+    api.tree.open()
+  end
+end, { silent = true, noremap = true, desc = "File Tree (Cmd+1)" })
 
 ---------------------------------------------------------------
 -- Telescope
