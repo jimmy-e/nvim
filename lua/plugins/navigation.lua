@@ -1,9 +1,56 @@
 return {
   {
+    "nvzone/volt",
+    lazy = true,
+  },
+
+  {
+    "nvzone/menu",
+    lazy = true,
+    dependencies = { "nvzone/volt" },
+  },
+
+  {
     "nvim-tree/nvim-tree.lua",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    dependencies = { "nvim-tree/nvim-web-devicons", "nvzone/menu" },
     config = function()
       local api = require("nvim-tree.api")
+
+      local function tree_actions_menu()
+        local ok_utils, menu_utils = pcall(require, "menu.utils")
+        if ok_utils then
+          menu_utils.delete_old_menus()
+        end
+
+        local ok_menu, menu = pcall(require, "menu")
+        if ok_menu then
+          menu.open("nvimtree")
+          return
+        end
+
+        vim.notify("nvzone/menu not available yet, using fallback tree actions", vim.log.levels.WARN)
+        local items = {
+          { label = "Create file or nested path", action = api.fs.create },
+          { label = "Rename file or folder", action = api.fs.rename },
+          { label = "Rename basename only", action = api.fs.rename_basename },
+          { label = "Delete file or folder", action = api.fs.remove },
+          { label = "Trash file or folder", action = api.fs.trash },
+          { label = "Cut", action = api.fs.cut },
+          { label = "Copy", action = api.fs.copy.node },
+          { label = "Paste", action = api.fs.paste },
+          { label = "Copy absolute path", action = api.fs.copy.absolute_path },
+          { label = "Copy relative path", action = api.fs.copy.relative_path },
+        }
+
+        vim.ui.select(items, {
+          prompt = "nvim-tree actions",
+          format_item = function(item) return item.label end,
+        }, function(choice)
+          if choice then
+            choice.action()
+          end
+        end)
+      end
 
       local function on_attach(bufnr)
         local opts = function(desc)
@@ -14,7 +61,12 @@ return {
         vim.keymap.set("n", "<Right>", api.node.open.edit, opts("Open"))
         vim.keymap.set("n", "j", api.node.navigate.parent_close, opts("Close Directory"))
         vim.keymap.set("n", "<Left>", api.node.navigate.parent_close, opts("Close Directory"))
+        vim.keymap.set("n", "m", tree_actions_menu, opts("Actions Menu"))
       end
+
+      vim.api.nvim_create_user_command("NvimTreeActions", tree_actions_menu, {
+        desc = "Open actions menu for the nvim-tree node under cursor",
+      })
 
       require("nvim-tree").setup({
         on_attach = on_attach,
