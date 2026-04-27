@@ -241,6 +241,7 @@ Custom IJKL-style layout (replaces default hjkl). Implemented with `vim.cmd("nno
 | `<F2>` / `Cmd+Shift+1` | Toggle nvim-tree show/hide |
 | `<F3>` / `Cmd+O` | Find files (Telescope, smart) |
 | `<F4>` / `Cmd+T` | Toggle floating terminal |
+| `<F5>` / `Cmd+F` | Live grep (Telescope) |
 | `<leader>fg` | Live grep (Telescope) |
 | `<leader>fb` | Buffers (Telescope) |
 
@@ -383,7 +384,7 @@ nvim-tree auto-opens on `VimEnter` via autocmd. Opens without stealing focus (`f
 
 **Custom keymaps** (set via `on_attach`, local to the tree buffer): `l` / `<Right>` opens a folder or file; `j` / `<Left>` closes the current directory. These override the global IJKL motion remaps inside the tree only.
 
-**iTerm2 Cmd+1 setup:** iTerm2 intercepts `Cmd+1` natively — remap in iTerm2 → Settings → Profiles → Keys → `+`: shortcut `Cmd+1`, action `Send Escape Sequence`, value `[57P`. Neovim receives `\x1b[57P`, translates to `<F1>`, keymap toggles focus between tree and editor.
+**iTerm2 Cmd+1 setup:** iTerm2 intercepts `Cmd+1` natively — remap in iTerm2 → Settings → Profiles → Keys → `+`: shortcut `Cmd+1`, action `Send Escape Sequence`, value `[57P`. Neovim receives `\x1b[57P`, translates to `<F1>`, keymap toggles focus between tree and editor. Implementation explicitly checks which window is focused (tree vs editor) rather than using `wincmd p` — avoids a bug where opening and closing the nvzone/menu popup corrupts the "previous window" history, causing `wincmd p` to fail.
 
 **iTerm2 Cmd+Shift+1 setup:** Same approach — shortcut `Cmd+Shift+1`, action `Send Escape Sequence`, value `[57Q`. Neovim receives `\x1b[57Q`, translates to `<F2>`, keymap toggles nvim-tree show/hide.
 
@@ -392,6 +393,8 @@ nvim-tree auto-opens on `VimEnter` via autocmd. Opens without stealing focus (`f
 **iTerm2 Cmd+T setup:** Same approach — shortcut `Cmd+T`, action `Send Escape Sequence`, value `[57S`. Neovim receives `\x1b[57S`, translates to `<F4>`, keymap toggles floating terminal (works in both normal and terminal modes).
 
 **iTerm2 Cmd+Shift+T setup:** Opens a new iTerm2 tab (configured in iTerm2 → Settings → Profiles → Keys → General: "Cmd+Shift+T" → New Tab).
+
+**iTerm2 Cmd+F setup:** Same approach — shortcut `Cmd+F`, action `Send Escape Sequence`, value `[15~`. Neovim receives `\x1b[15~`, translates to `<F5>`, keymap opens live grep (Telescope).
 
 **Smart file finder** (`<leader>ff` / `<F3>` / Cmd+O): Fuzzy searches all project files. Typing a query ending with `/` switches to directory-only results (uses `fd --type d`). Pressing `<CR>` on a directory opens nvim-tree, navigates to that folder, expands it, and places the cursor on it. Implemented as a custom `attach_mappings` wrapper around `telescope.builtin.find_files` in `lua/keymaps.lua`.
 

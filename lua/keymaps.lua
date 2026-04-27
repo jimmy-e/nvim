@@ -41,10 +41,23 @@ vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { silent = true, desc = 
 -- Toggle focus: tree ↔ editor
 vim.keymap.set("n", "<F1>", function()
   local api = require("nvim-tree.api")
-  if api.tree.is_visible() then
-    vim.cmd("wincmd p")
-  else
+  if not api.tree.is_visible() then
     api.tree.open()
+    return
+  end
+  local tree_win = api.tree.winid()
+  local cur_win = vim.api.nvim_get_current_win()
+  if cur_win == tree_win then
+    -- In tree → jump to first non-tree non-floating window
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+      if win ~= tree_win and vim.api.nvim_win_get_config(win).relative == "" then
+        vim.api.nvim_set_current_win(win)
+        return
+      end
+    end
+  else
+    -- In editor → focus tree
+    api.tree.focus()
   end
 end, { silent = true, noremap = true, desc = "File Tree (Cmd+1)" })
 -- iTerm2 Cmd+Shift+1 sends \x1b[57Q, which translates to <F2>
@@ -112,6 +125,11 @@ end
 
 vim.keymap.set("n", "<leader>ff", smart_find_files, { silent = true, desc = "Find Files" })
 vim.keymap.set("n", "<F3>", smart_find_files, { silent = true, desc = "Find Files (Cmd+O)" })
+
+-- iTerm2 Cmd+F sends \x1b[15~, which translates to <F5>
+vim.keymap.set("n", "<F5>", function()
+  require("telescope.builtin").live_grep()
+end, { silent = true, desc = "Live Grep (Cmd+F)" })
 
 vim.keymap.set("n", "<leader>fg", function()
   require("telescope.builtin").live_grep()
