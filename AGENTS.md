@@ -372,9 +372,16 @@ Custom IJKL-style layout (replaces default hjkl). Implemented with `vim.cmd("nno
 
 ## Treesitter
 
-Uses the new nvim-treesitter v1 API (`require("nvim-treesitter").install(...)`). Highlighting is enabled globally via a `BufReadPost *` autocmd with `pcall(vim.treesitter.start)` — silently skips filetypes without parsers.
+Uses the new nvim-treesitter v1 API (`require("nvim-treesitter").install(...)`). Highlighting is enabled globally via a `FileType *` autocmd that calls `pcall(vim.treesitter.start, args.buf)` — silently skips filetypes without parsers. `FileType` is used (not `BufReadPost`) because it fires after `&filetype` is set, including on `:edit` reloads.
 
-Diagnostic command: `:TSStatus` — reports filetype, parser status, and highlighter status for current buffer.
+Diagnostic commands:
+- `:TSStatus` — reports filetype, parser status, and highlighter status for current buffer
+- `:InspectTree` — shows the full parse tree (confirms parsing works)
+- `:Inspect` — shows all highlight groups (Treesitter captures, LSP semantic tokens, syntax, extmarks) at the cursor
+
+**Custom highlight queries:** Extra Python captures (variables, function names, parameters, ALL_CAPS constants, etc.) live in `after/queries/python/highlights.scm`. **Never** put a `highlights.scm` directly in `queries/<lang>/` — Neovim treats that as a full replacement for the official query, not an extension. The `after/queries/` location is the only correct place for additive overrides.
+
+**Past gotcha (April 2026):** Python files rendered mostly white because `~/.config/nvim/queries/python/highlights.scm` existed and shadowed the official 456-line query with a 46-line custom one (only ~40 captures fired for a 134-line file). Symptom diagnostic chain: `:Inspect` showed no Treesitter section despite `:TSStatus` reporting `highlighter=true` and `:InspectTree` showing a valid AST. The fix was deleting the file in `queries/` while keeping the identical copy in `after/queries/`. To find shadowing query files: `:echo nvim_get_runtime_file("queries/<lang>/highlights.scm", v:true)`.
 
 ---
 

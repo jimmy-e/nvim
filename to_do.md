@@ -1,5 +1,3 @@
-- cmd + y to rename folders and files in tree sitter
-- cmd + l
 - python syntax support
 - markdown support
 - typescript / react syntax support

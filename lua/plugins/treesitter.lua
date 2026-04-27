@@ -28,11 +28,12 @@ return {
         "comment",
       })
 
-      -- Enable treesitter highlighting for all filetypes (silently skip unsupported ones)
-      vim.api.nvim_create_autocmd("BufReadPost", {
+      -- Enable treesitter highlighting for all filetypes (silently skip unsupported ones).
+      -- FileType is the canonical event: fires after &filetype is set, even on :edit reloads.
+      vim.api.nvim_create_autocmd("FileType", {
         pattern = "*",
-        callback = function()
-          pcall(vim.treesitter.start)
+        callback = function(args)
+          pcall(vim.treesitter.start, args.buf)
         end,
       })
 

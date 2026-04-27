@@ -300,6 +300,76 @@ return {
 
       -- Apply the selected scheme
       vim.cmd.colorscheme(ACTIVE_THEME)
+
+      -- Apply explicit Treesitter + LSP highlight overrides for monokai-pro
+      -- (monokai-pro doesn't expose an on_highlights hook like tokyonight)
+      if starts_with(ACTIVE_THEME, "monokai-pro") then
+        local s = vim.api.nvim_set_hl
+        local pink   = "#fc618d"
+        local orange = "#fd9353"
+        local yellow = "#fce566"
+        local green  = "#7bd88f"
+        local cyan   = "#5ad4e6"
+        local purple = "#948ae3"
+        local white  = "#f7f1ff"
+        local gray   = "#69676c"
+        s(0, "@comment",                        { fg = gray,   italic = true })
+        s(0, "@keyword",                        { fg = pink,   italic = true })
+        s(0, "@keyword.function",               { fg = pink,   italic = true })
+        s(0, "@keyword.return",                 { fg = pink,   italic = true })
+        s(0, "@keyword.operator",               { fg = pink })
+        s(0, "@keyword.import",                 { fg = yellow, italic = true })
+        s(0, "@function",                       { fg = green,  bold = true })
+        s(0, "@function.call",                  { fg = green })
+        s(0, "@function.method",                { fg = green,  bold = true })
+        s(0, "@function.method.call",           { fg = green })
+        s(0, "@function.builtin",               { fg = cyan,   bold = true })
+        s(0, "@constructor",                    { fg = cyan,   bold = true })
+        s(0, "@type",                           { fg = cyan,   bold = true })
+        s(0, "@type.builtin",                   { fg = cyan,   bold = true })
+        s(0, "@type.definition",                { fg = cyan,   bold = true })
+        s(0, "@module",                         { fg = cyan })
+        s(0, "@variable",                       { fg = white })
+        s(0, "@variable.builtin",               { fg = pink })
+        s(0, "@variable.parameter",             { fg = orange })
+        s(0, "@variable.parameter.builtin",     { fg = orange })
+        s(0, "@variable.member",                { fg = purple })
+        s(0, "@property",                       { fg = purple })
+        s(0, "@attribute",                      { fg = yellow })
+        s(0, "@attribute.builtin",              { fg = orange, italic = true })
+        s(0, "@constant",                       { fg = purple, bold = true })
+        s(0, "@constant.builtin",               { fg = purple, bold = true })
+        s(0, "@string",                         { fg = yellow })
+        s(0, "@string.escape",                  { fg = pink })
+        s(0, "@number",                         { fg = orange })
+        s(0, "@boolean",                        { fg = orange, bold = true })
+        s(0, "@operator",                       { fg = pink })
+        s(0, "@punctuation.delimiter",          { fg = white })
+        s(0, "@punctuation.bracket",            { fg = white })
+        s(0, "@punctuation.special",            { fg = pink })
+        s(0, "@lsp.type.variable",              { fg = white })
+        s(0, "@lsp.type.parameter",             { fg = orange })
+        s(0, "@lsp.type.function",              { fg = green,  bold = true })
+        s(0, "@lsp.type.method",                { fg = green,  bold = true })
+        s(0, "@lsp.type.property",              { fg = purple })
+        s(0, "@lsp.type.type",                  { fg = cyan,   bold = true })
+        s(0, "@lsp.type.class",                 { fg = cyan,   bold = true })
+        s(0, "@lsp.type.namespace",             { fg = cyan })
+        s(0, "@lsp.type.module",                { fg = cyan })
+        s(0, "@lsp.type.enum",                  { fg = cyan })
+        s(0, "@lsp.type.enumMember",            { fg = purple })
+        s(0, "@lsp.type.keyword",               { fg = pink,   italic = true })
+        s(0, "@lsp.type.string",                { fg = yellow })
+        s(0, "@lsp.type.number",                { fg = orange })
+        s(0, "@lsp.type.decorator",             { fg = yellow, italic = true })
+        s(0, "@lsp.type.selfParameter",         { fg = pink })
+        s(0, "@lsp.type.clsParameter",          { fg = pink })
+        s(0, "@lsp.typemod.variable.readonly",  { fg = purple, bold = true })
+        s(0, "@lsp.typemod.variable.defaultLibrary", { fg = cyan })
+        s(0, "@lsp.typemod.function.builtin",   { fg = cyan,   bold = true })
+        s(0, "@lsp.typemod.class.defaultLibrary", { fg = cyan, bold = true })
+        s(0, "@lsp.typemod.variable.typeHint",  { fg = cyan })
+      end
     end,
   },
 
