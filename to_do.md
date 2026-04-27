@@ -1,3 +1,5 @@
+- have multiple tabs for files
+- toggle edit mode and read mode for markdown
 - python syntax support
 - markdown support
 - typescript / react syntax support
