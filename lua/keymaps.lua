@@ -130,6 +130,10 @@ vim.keymap.set("n", "<F3>", smart_find_files, { silent = true, desc = "Find File
 vim.keymap.set("n", "<F5>", function()
   require("telescope.builtin").live_grep()
 end, { silent = true, desc = "Live Grep (Cmd+F)" })
+-- iTerm2 Cmd+[ sends \x1b[17~, which translates to <F6>
+vim.keymap.set("n", "<F6>", "<Cmd>BufferLineCyclePrev<CR>", { silent = true, desc = "Prev Buffer Tab (Cmd+[)" })
+-- iTerm2 Cmd+] sends \x1b[18~, which translates to <F7>
+vim.keymap.set("n", "<F7>", "<Cmd>BufferLineCycleNext<CR>", { silent = true, desc = "Next Buffer Tab (Cmd+])" })
 
 vim.keymap.set("n", "<leader>fg", function()
   require("telescope.builtin").live_grep()
@@ -138,6 +142,13 @@ end, { silent = true, desc = "Live Grep" })
 vim.keymap.set("n", "<leader>fb", function()
   require("telescope.builtin").buffers()
 end, { silent = true, desc = "Buffers" })
+
+---------------------------------------------------------------
+-- Buffer tabs
+---------------------------------------------------------------
+vim.keymap.set("n", "<leader>bn", "<Cmd>BufferLineCycleNext<CR>", { silent = true, desc = "Next Buffer Tab" })
+vim.keymap.set("n", "<leader>bp", "<Cmd>BufferLineCyclePrev<CR>", { silent = true, desc = "Prev Buffer Tab" })
+vim.keymap.set("n", "<leader>bx", "<Cmd>bdelete<CR>", { silent = true, desc = "Close Buffer Tab" })
 
 ---------------------------------------------------------------
 -- Git (Neogit)

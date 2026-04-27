@@ -374,6 +374,39 @@ return {
   },
 
   ------------------------------------------------------------------
+  -- Buffer tabs
+  ------------------------------------------------------------------
+  {
+    "akinsho/bufferline.nvim",
+    version = "*",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function()
+      require("bufferline").setup({
+        options = {
+          mode = "buffers",
+          diagnostics = "nvim_lsp",
+          always_show_bufferline = true,
+          show_close_icon = false,
+          show_buffer_close_icons = false,
+          separator_style = "slant",
+          offsets = {
+            {
+              filetype = "NvimTree",
+              text = "Project",
+              text_align = "left",
+              separator = true,
+            },
+          },
+          custom_filter = function(buf_number)
+            local bo = vim.bo[buf_number]
+            return bo.buftype == "" and bo.buflisted
+          end,
+        },
+      })
+    end,
+  },
+
+  ------------------------------------------------------------------
   -- Statusline
   ------------------------------------------------------------------
   {

@@ -34,6 +34,7 @@ Neovim version: **0.12.1** (important — some APIs behave differently, see Note
 |---|---|
 | `folke/tokyonight.nvim` | Primary colorscheme family |
 | `EdenEast/nightfox.nvim` | Alternate colorscheme family |
+| `akinsho/bufferline.nvim` | IntelliJ-style buffer tabline for open files |
 | `nvim-lualine/lualine.nvim` | Statusline |
 | `nvim-tree/nvim-web-devicons` | File icons (dependency for many plugins) |
 
@@ -242,6 +243,8 @@ Custom IJKL-style layout (replaces default hjkl). Implemented with `vim.cmd("nno
 | `<F3>` / `Cmd+O` | Find files (Telescope, smart) |
 | `<F4>` / `Cmd+T` | Toggle floating terminal |
 | `<F5>` / `Cmd+F` | Live grep (Telescope) |
+| `<F6>` / `Cmd+[` | Previous file tab |
+| `<F7>` / `Cmd+]` | Next file tab |
 | `<leader>fg` | Live grep (Telescope) |
 | `<leader>fb` | Buffers (Telescope) |
 
@@ -403,9 +406,15 @@ nvim-tree auto-opens on `VimEnter` via autocmd. Opens without stealing focus (`f
 
 **iTerm2 Cmd+F setup:** Same approach — shortcut `Cmd+F`, action `Send Escape Sequence`, value `[15~`. Neovim receives `\x1b[15~`, translates to `<F5>`, keymap opens live grep (Telescope).
 
+**iTerm2 Cmd+[ setup:** Same approach — shortcut `Cmd+[`, action `Send Escape Sequence`, value `[17~`. Neovim receives `\x1b[17~`, translates to `<F6>`, keymap moves to the previous buffer tab.
+
+**iTerm2 Cmd+] setup:** Same approach — shortcut `Cmd+]`, action `Send Escape Sequence`, value `[18~`. Neovim receives `\x1b[18~`, translates to `<F7>`, keymap moves to the next buffer tab.
+
 **Smart file finder** (`<leader>ff` / `<F3>` / Cmd+O): Fuzzy searches all project files. Typing a query ending with `/` switches to directory-only results (uses `fd --type d`). Pressing `<CR>` on a directory opens nvim-tree, navigates to that folder, expands it, and places the cursor on it. Implemented as a custom `attach_mappings` wrapper around `telescope.builtin.find_files` in `lua/keymaps.lua`.
 
 **Folder icons:** Uses distinct icons for different folder states (default, open, empty, symlink) with `▸`/`▾` arrows to indicate expand/collapse. Indent markers show folder hierarchy. Icons and colors are configured in `lua/plugins/navigation.lua`.
+
+**Buffer tabs:** Open file tabs are provided by `bufferline.nvim` in `buffers` mode, so they represent listed file buffers rather than native Neovim tab pages. The tabline is intentionally offset for `nvim-tree`, and non-file buffers (terminal, prompts, scratch buffers) are filtered out. `bufferline.nvim` currently renders at the top; there is no supported bottom-of-screen placement option in the plugin.
 
 ---
 
@@ -444,6 +453,7 @@ Custom popup navigator that manages three floating panels as a group:
 
 - **Motion remapping** uses `vim.cmd("nnoremap ...")` — `vim.keymap.set` and `vim.api.nvim_set_keymap` both fail for single-character key remaps on Neovim 0.12.1.
 - **LSP** uses native Neovim 0.11+ API (`vim.lsp.config` / `vim.lsp.enable`) in `lua/lsp.lua`. The `lua/plugins/lsp.lua` plugin spec also configures via `vim.lsp.config` — there is intentional overlap; the plugin file handles lazy-loading behavior.
+- **Buffer tabs** are powered by `bufferline.nvim`, not native Neovim tab pages. They stay at the top of the editor; bottom placement is not supported by the plugin at this time.
 - **Auto-save** is on by default (1s inactivity). Toggle with `<leader>ta`.
 - **Folding** uses `foldmethod=indent` with all folds open by default (`foldlevel=99`).
 - **Clipboard** is synced with system clipboard (`unnamedplus`).
