@@ -13,6 +13,7 @@
 * change width of tree  
 * copy filename of file in tree
 * file explorer: suggestions should start from top, not from bottom
+* why is it that when I open a new line with an open `(` before that new line, it automatically doesn't add a `)`, etc for similar syntax
 
   -------------------------------------------
 
