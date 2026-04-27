@@ -8,6 +8,8 @@
 - slack integration
 - use tmux
   https://www.youtube.com/shorts/PL1EoKjy4iM
+* change width of tree  
+* copy filename of file in tree
 
   -------------------------------------------
 
