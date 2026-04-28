@@ -15,11 +15,6 @@ return {
                   return require("buffer_tabs").render(buffer, window)
                 end,
               },
-              { kind = "empty", hl = "StatusLine" },
-              { kind = "diagnostics" },
-              { kind = "branch" },
-              { kind = "mode" },
-              { kind = "ruler" },
             },
           },
         },
@@ -29,6 +24,13 @@ return {
       })
 
       require("bars.highlights").setup()
+      require("buffer_tabs").setup_highlights()
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("BufferTabsHighlights", { clear = true }),
+        callback = function()
+          require("buffer_tabs").setup_highlights()
+        end,
+      })
       require("bars.statusline"):start()
     end,
   },

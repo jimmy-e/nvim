@@ -1,5 +1,14 @@
 local M = {}
 
+function M.setup_highlights()
+  vim.api.nvim_set_hl(0, "FooterTabsFill", { fg = "#6e6a73", bg = "#1b1a1f" })
+  vim.api.nvim_set_hl(0, "FooterTab", { fg = "#b8b4bd", bg = "#232126" })
+  vim.api.nvim_set_hl(0, "FooterTabEdge", { fg = "#1b1a1f", bg = "#1b1a1f" })
+  vim.api.nvim_set_hl(0, "FooterTabActive", { fg = "#f3f1f5", bg = "#2b2830", bold = true })
+  vim.api.nvim_set_hl(0, "FooterTabActiveAccent", { fg = "#e6c15a", bg = "#2b2830", bold = true })
+  vim.api.nvim_set_hl(0, "FooterTabMeta", { fg = "#9b96a3", bg = "#1b1a1f" })
+end
+
 local function is_file_buffer(bufnr)
   if not vim.api.nvim_buf_is_valid(bufnr) then
     return false
@@ -69,6 +78,19 @@ local function display_name(bufnr)
   end
 
   return label
+end
+
+local function file_icon(bufnr)
+  local ok, devicons = pcall(require, "nvim-web-devicons")
+  if not ok then
+    return "", nil
+  end
+
+  local name = vim.api.nvim_buf_get_name(bufnr)
+  local filename = name == "" and "text" or vim.fn.fnamemodify(name, ":t")
+  local extension = vim.fn.fnamemodify(filename, ":e")
+  local icon, hl = devicons.get_icon(filename, extension, { default = true })
+  return (icon or "") ~= "" and (icon .. " ") or "", hl
 end
 
 local function tree_prefix()
@@ -150,7 +172,7 @@ local function visible_buffers(buffers, current, max_width)
   local current_index = 1
 
   for i, bufnr in ipairs(buffers) do
-    widths[i] = vim.fn.strdisplaywidth(display_name(bufnr)) + 2
+    widths[i] = vim.fn.strdisplaywidth(file_icon(bufnr)) + vim.fn.strdisplaywidth(display_name(bufnr)) + 5
     if bufnr == current then
       current_index = i
     end
@@ -213,21 +235,35 @@ function M.render(_, window)
   local start_idx, end_idx = visible_buffers(buffers, current, max_width)
   local parts = {}
 
-  table.insert(parts, "%#StatusLine#")
+  table.insert(parts, "%#FooterTabsFill#")
   table.insert(parts, tree_prefix())
 
   if start_idx > 1 then
-    table.insert(parts, "%#TabLine# … ")
+    table.insert(parts, "%#FooterTabsFill#  ")
+    table.insert(parts, "%#FooterTab# … ")
   end
 
   for i = start_idx, end_idx do
     local bufnr = buffers[i]
-    local hl = bufnr == current and "%#TabLineSel#" or "%#TabLine#"
-    table.insert(parts, hl .. " " .. display_name(bufnr) .. " ")
+    local active = bufnr == current
+    local tab_hl = active and "%#FooterTabActive#" or "%#FooterTab#"
+    local accent_hl = active and "%#FooterTabActiveAccent#" or "%#FooterTabEdge#"
+    local icon, icon_hl = file_icon(bufnr)
+
+    table.insert(parts, "%#FooterTabEdge# ")
+    table.insert(parts, accent_hl .. "▎")
+    table.insert(parts, tab_hl .. " ")
+    if icon ~= "" then
+      table.insert(parts, icon_hl and ("%#" .. icon_hl .. "#") or tab_hl)
+      table.insert(parts, icon)
+      table.insert(parts, tab_hl)
+    end
+    table.insert(parts, display_name(bufnr) .. " ")
+    table.insert(parts, tab_hl .. " ")
   end
 
   if end_idx < #buffers then
-    table.insert(parts, "%#TabLine# … ")
+    table.insert(parts, "%#FooterTab# … ")
   end
 
   local meta = {}
@@ -245,7 +281,8 @@ function M.render(_, window)
   table.insert(meta, progress())
   table.insert(meta, location())
 
-  table.insert(parts, "%#StatusLine#%=" .. table.concat(meta, "  "))
+  table.insert(parts, "%#FooterTabsFill#%=")
+  table.insert(parts, "%#FooterTabMeta#" .. table.concat(meta, "  "))
   return table.concat(parts, "")
 end
 

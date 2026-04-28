@@ -1,6 +1,5 @@
-- have multiple tabs for files
+* cmd + o to go to source
 - toggle edit mode and read mode for markdown
-- python syntax support
 - markdown support
 - typescript / react syntax support
 - ai auto suggest
