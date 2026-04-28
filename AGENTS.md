@@ -15,6 +15,7 @@ Neovim version: **0.12.1** (important — some APIs behave differently, see Note
 | `lua/options.lua` | Editor settings (indentation, folding, auto-save, visuals) |
 | `lua/keymaps.lua` | All global keymaps (leader = `<Space>`) |
 | `lua/lsp.lua` | Native Neovim 0.11+ LSP config (`vim.lsp.config` / `vim.lsp.enable`) |
+| `lua/buffer_tabs.lua` | Bottom buffer-strip renderer + next/prev/close helpers |
 | `lua/env-manager.lua` | Auto-loads `.env` on startup; floating editor to edit env vars |
 | `lua/floating_terminal.lua` | Persistent floating terminal implementation |
 | `lua/cheatsheet.lua` | Floating cheatsheet popup |
@@ -34,8 +35,7 @@ Neovim version: **0.12.1** (important — some APIs behave differently, see Note
 |---|---|
 | `folke/tokyonight.nvim` | Primary colorscheme family |
 | `EdenEast/nightfox.nvim` | Alternate colorscheme family |
-| `akinsho/bufferline.nvim` | IntelliJ-style buffer tabline for open files |
-| `nvim-lualine/lualine.nvim` | Statusline |
+| `OXY2DEV/bars.nvim` | Active bottom statusline buffer-strip implementation |
 | `nvim-tree/nvim-web-devicons` | File icons (dependency for many plugins) |
 
 ### Treesitter (`lua/plugins/treesitter.lua`)
@@ -139,7 +139,7 @@ Terminal: floating window, 85% width × 80% height, rounded border.
 |---|---|---|
 | `ThePrimeagen/harpoon` (harpoon2) | `harpoon.lua` | Quick-mark and jump between files |
 | `mbbill/undotree` | `undotree.lua` | Undo history visualizer |
-| `folke/zen-mode.nvim` | `zen.lua` | Distraction-free writing (120-wide, hides lualine/gitsigns/nvim-tree) |
+| `folke/zen-mode.nvim` | `zen.lua` | Distraction-free writing (120-wide, hides statusline/gitsigns/nvim-tree) |
 | `folke/trouble.nvim` | `trouble.lua` | Diagnostic list (`:Trouble`) |
 | `Jpifer13/popnav.nvim` | `popnav.lua` | Custom popup navigator (Terminal, Cheatsheet, Claude) |
 | CSV plugins | `csv.lua` / `csvview.lua` | CSV table viewing |
@@ -247,6 +247,9 @@ Custom IJKL-style layout (replaces default hjkl). Implemented with `vim.cmd("nno
 | `<F7>` / `Cmd+]` | Next file tab |
 | `<leader>fg` | Live grep (Telescope) |
 | `<leader>fb` | Buffers (Telescope) |
+| `<leader>bn` | Next file tab |
+| `<leader>bp` | Previous file tab |
+| `<leader>bx` | Close current file tab |
 
 **nvim-tree buffer keymaps (local to tree):**
 | Keymap | Action |
@@ -414,7 +417,7 @@ nvim-tree auto-opens on `VimEnter` via autocmd. Opens without stealing focus (`f
 
 **Folder icons:** Uses distinct icons for different folder states (default, open, empty, symlink) with `▸`/`▾` arrows to indicate expand/collapse. Indent markers show folder hierarchy. Icons and colors are configured in `lua/plugins/navigation.lua`.
 
-**Buffer tabs:** Open file tabs are provided by `bufferline.nvim` in `buffers` mode, so they represent listed file buffers rather than native Neovim tab pages. The tabline is intentionally offset for `nvim-tree`, and non-file buffers (terminal, prompts, scratch buffers) are filtered out. `bufferline.nvim` currently renders at the top; there is no supported bottom-of-screen placement option in the plugin.
+**Buffer tabs:** Open file tabs are rendered through `bars.nvim` as a custom global statusline (`laststatus=3`), so they appear at the bottom instead of the top. They represent listed file buffers rather than native Neovim tab pages, and non-file buffers (terminal, prompts, scratch buffers, `nvim-tree`) are filtered out of the tab strip. The right side of the same bar shows status metadata again (diagnostics, git branch, mode, ruler).
 
 ---
 
@@ -453,7 +456,8 @@ Custom popup navigator that manages three floating panels as a group:
 
 - **Motion remapping** uses `vim.cmd("nnoremap ...")` — `vim.keymap.set` and `vim.api.nvim_set_keymap` both fail for single-character key remaps on Neovim 0.12.1.
 - **LSP** uses native Neovim 0.11+ API (`vim.lsp.config` / `vim.lsp.enable`) in `lua/lsp.lua`. The `lua/plugins/lsp.lua` plugin spec also configures via `vim.lsp.config` — there is intentional overlap; the plugin file handles lazy-loading behavior.
-- **Buffer tabs** are powered by `bufferline.nvim`, not native Neovim tab pages. They stay at the top of the editor; bottom placement is not supported by the plugin at this time.
+- **Buffer tabs** are powered by a custom `bars.nvim` statusline renderer, not native Neovim tab pages. The active tab strip is shown at the bottom of the editor via the global statusline (`laststatus=3`).
+- **bars.nvim** is configured only for the statusline. Its `statuscolumn`, `winbar`, and `tabline` modules remain disabled to avoid replacing the rest of the UI.
 - **Auto-save** is on by default (1s inactivity). Toggle with `<leader>ta`.
 - **Folding** uses `foldmethod=indent` with all folds open by default (`foldlevel=99`).
 - **Clipboard** is synced with system clipboard (`unnamedplus`).

@@ -41,6 +41,7 @@ extend(require("plugins.harpoon"))
 extend(require("plugins.undotree"))
 extend(require("plugins.testing"))
 extend(require("plugins.popnav"))
+extend(require("plugins.bars"))
 
 -----------------------------------------------------------
 -- Setup lazy.nvim
