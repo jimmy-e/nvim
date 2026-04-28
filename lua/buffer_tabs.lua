@@ -138,6 +138,7 @@ function M.render(_, window)
   if not is_file_buffer(current) then
     current = current_listed_buffer()
   end
+
   local max_width = math.max(20, vim.api.nvim_win_get_width(window) - 12)
   local start_idx, end_idx = visible_buffers(buffers, current, max_width)
   local parts = {}

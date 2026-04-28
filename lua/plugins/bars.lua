@@ -27,6 +27,9 @@ return {
         winbar = false,
         tabline = false,
       })
+
+      require("bars.highlights").setup()
+      require("bars.statusline"):start()
     end,
   },
 }
