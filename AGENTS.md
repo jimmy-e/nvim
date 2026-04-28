@@ -15,7 +15,7 @@ Neovim version: **0.12.1** (important — some APIs behave differently, see Note
 | `lua/options.lua` | Editor settings (indentation, folding, auto-save, visuals) |
 | `lua/keymaps.lua` | All global keymaps (leader = `<Space>`) |
 | `lua/lsp.lua` | Native Neovim 0.11+ LSP config (`vim.lsp.config` / `vim.lsp.enable`) |
-| `lua/buffer_tabs.lua` | Bottom buffer-strip renderer + next/prev/close helpers |
+| `lua/buffer_tabs.lua` | Bottom footer tab/statusline renderer + next/prev/close helpers |
 | `lua/env-manager.lua` | Auto-loads `.env` on startup; floating editor to edit env vars |
 | `lua/floating_terminal.lua` | Persistent floating terminal implementation |
 | `lua/cheatsheet.lua` | Floating cheatsheet popup |
@@ -417,7 +417,7 @@ nvim-tree auto-opens on `VimEnter` via autocmd. Opens without stealing focus (`f
 
 **Folder icons:** Uses distinct icons for different folder states (default, open, empty, symlink) with `▸`/`▾` arrows to indicate expand/collapse. Indent markers show folder hierarchy. Icons and colors are configured in `lua/plugins/navigation.lua`.
 
-**Buffer tabs:** Open file tabs are rendered through `bars.nvim` as a custom global statusline (`laststatus=3`), so they appear at the bottom instead of the top. They represent listed file buffers rather than native Neovim tab pages, and non-file buffers (terminal, prompts, scratch buffers, `nvim-tree`) are filtered out of the tab strip. The right side of the same bar shows status metadata again (diagnostics, git branch, mode, ruler).
+**Buffer tabs:** Open file tabs are rendered through `bars.nvim` as a custom global statusline (`laststatus=3`), so they appear at the bottom instead of the top. They represent listed file buffers rather than native Neovim tab pages, and non-file buffers (terminal, prompts, scratch buffers, `nvim-tree`) are filtered out of the tab strip. The left side shows file tabs, the right side shows compact status metadata (git branch, mode, encoding, filetype, progress, line:column), and when `nvim-tree` is open on the left the tabs are padded so they start after the tree instead of at column 0.
 
 ---
 
@@ -456,7 +456,7 @@ Custom popup navigator that manages three floating panels as a group:
 
 - **Motion remapping** uses `vim.cmd("nnoremap ...")` — `vim.keymap.set` and `vim.api.nvim_set_keymap` both fail for single-character key remaps on Neovim 0.12.1.
 - **LSP** uses native Neovim 0.11+ API (`vim.lsp.config` / `vim.lsp.enable`) in `lua/lsp.lua`. The `lua/plugins/lsp.lua` plugin spec also configures via `vim.lsp.config` — there is intentional overlap; the plugin file handles lazy-loading behavior.
-- **Buffer tabs** are powered by a custom `bars.nvim` statusline renderer, not native Neovim tab pages. The active tab strip is shown at the bottom of the editor via the global statusline (`laststatus=3`).
+- **Buffer tabs** are powered by a custom `bars.nvim` statusline renderer, not native Neovim tab pages. The active tab strip is shown at the bottom of the editor via the global statusline (`laststatus=3`), includes right-side status metadata, and offsets itself when `nvim-tree` is visible on the left.
 - **bars.nvim** is configured only for the statusline. Its `statuscolumn`, `winbar`, and `tabline` modules remain disabled to avoid replacing the rest of the UI.
 - **Auto-save** is on by default (1s inactivity). Toggle with `<leader>ta`.
 - **Folding** uses `foldmethod=indent` with all folds open by default (`foldlevel=99`).

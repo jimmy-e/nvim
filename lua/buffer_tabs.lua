@@ -71,6 +71,26 @@ local function display_name(bufnr)
   return label
 end
 
+local function tree_prefix()
+  local ok, api = pcall(require, "nvim-tree.api")
+  if not ok or not api.tree.is_visible() then
+    return ""
+  end
+
+  local tree_win = api.tree.winid()
+  if not tree_win or not vim.api.nvim_win_is_valid(tree_win) then
+    return ""
+  end
+
+  local pos = vim.api.nvim_win_get_position(tree_win)
+  if not pos or pos[2] ~= 0 then
+    return ""
+  end
+
+  local width = vim.api.nvim_win_get_width(tree_win)
+  return string.rep(" ", width + 1)
+end
+
 local function mode_label()
   local mode = vim.api.nvim_get_mode().mode
   local labels = {
@@ -194,6 +214,7 @@ function M.render(_, window)
   local parts = {}
 
   table.insert(parts, "%#StatusLine#")
+  table.insert(parts, tree_prefix())
 
   if start_idx > 1 then
     table.insert(parts, "%#TabLine# … ")
