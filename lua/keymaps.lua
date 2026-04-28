@@ -64,13 +64,19 @@ end, { silent = true, noremap = true, desc = "File Tree (Cmd+1)" })
 -- Toggle tree show/hide
 vim.keymap.set("n", "<F2>", ":NvimTreeToggle<CR>", { silent = true, desc = "Toggle Tree (Cmd+Shift+1)" })
 -- iTerm2 Cmd+T sends \x1b[57S, which translates to <F4>
--- Toggle floating terminal
+-- Toggle bottom terminal
 vim.keymap.set("n", "<F4>", function()
   require("floating_terminal").toggle()
 end, { silent = true, noremap = true, desc = "Terminal (Cmd+T)" })
 vim.keymap.set("t", "<F4>", function()
   require("floating_terminal").toggle()
 end, { silent = true, noremap = true, desc = "Terminal (Cmd+T)" })
+vim.keymap.set("n", "<M-t>", function()
+  require("floating_terminal").new()
+end, { silent = true, noremap = true, desc = "Terminal: New Session" })
+vim.keymap.set("t", "<M-t>", function()
+  require("floating_terminal").new()
+end, { silent = true, noremap = true, desc = "Terminal: New Session" })
 
 ---------------------------------------------------------------
 -- Telescope
@@ -130,13 +136,40 @@ vim.keymap.set("n", "<F3>", smart_find_files, { silent = true, desc = "Find File
 vim.keymap.set("n", "<F5>", function()
   require("telescope.builtin").live_grep()
 end, { silent = true, desc = "Live Grep (Cmd+F)" })
+
+local function is_bottom_terminal_session()
+  return vim.bo.buftype == "terminal" and vim.b.bottom_terminal_session == true
+end
+
+local function prev_tab_or_terminal()
+  if is_bottom_terminal_session() then
+    require("floating_terminal").prev()
+    return
+  end
+  require("buffer_tabs").prev()
+end
+
+local function next_tab_or_terminal()
+  if is_bottom_terminal_session() then
+    require("floating_terminal").next()
+    return
+  end
+  require("buffer_tabs").next()
+end
+
 -- iTerm2 Cmd+[ sends \x1b[17~, which translates to <F6>
 vim.keymap.set("n", "<F6>", function()
-  require("buffer_tabs").prev()
+  prev_tab_or_terminal()
+end, { silent = true, desc = "Prev Buffer Tab (Cmd+[)" })
+vim.keymap.set("t", "<F6>", function()
+  prev_tab_or_terminal()
 end, { silent = true, desc = "Prev Buffer Tab (Cmd+[)" })
 -- iTerm2 Cmd+] sends \x1b[18~, which translates to <F7>
 vim.keymap.set("n", "<F7>", function()
-  require("buffer_tabs").next()
+  next_tab_or_terminal()
+end, { silent = true, desc = "Next Buffer Tab (Cmd+])" })
+vim.keymap.set("t", "<F7>", function()
+  next_tab_or_terminal()
 end, { silent = true, desc = "Next Buffer Tab (Cmd+])" })
 
 vim.keymap.set("n", "<leader>fg", function()
@@ -166,15 +199,31 @@ end, { silent = true, desc = "Close Buffer Tab" })
 vim.keymap.set("n", "<leader>gs", ":Neogit<CR>", { silent = true, desc = "Neogit Status" })
 
 ---------------------------------------------------------------
--- Terminal (floating, persistent session)
+-- Terminal (bottom split, persistent session)
 ---------------------------------------------------------------
 vim.keymap.set("n", "<leader>\\", function()
   require("floating_terminal").toggle()
-end, { desc = "Toggle Floating Terminal" })
+end, { desc = "Toggle Terminal" })
 
 vim.keymap.set("t", "<leader>\\", function()
   require("floating_terminal").toggle()
-end, { desc = "Toggle Floating Terminal" })
+end, { desc = "Toggle Terminal" })
+
+vim.keymap.set("n", "<leader>tn", function()
+  require("floating_terminal").next()
+end, { desc = "Terminal: Next Session" })
+
+vim.keymap.set("t", "<leader>tn", function()
+  require("floating_terminal").next()
+end, { desc = "Terminal: Next Session" })
+
+vim.keymap.set("n", "<leader>tp", function()
+  require("floating_terminal").prev()
+end, { desc = "Terminal: Previous Session" })
+
+vim.keymap.set("t", "<leader>tp", function()
+  require("floating_terminal").prev()
+end, { desc = "Terminal: Previous Session" })
 
 ---------------------------------------------------------------
 -- Window navigation (not motions)

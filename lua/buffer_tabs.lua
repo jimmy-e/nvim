@@ -9,6 +9,15 @@ function M.setup_highlights()
   vim.api.nvim_set_hl(0, "FooterTabMeta", { fg = "#9b96a3", bg = "#1b1a1f" })
 end
 
+local function is_terminal_session_buffer(bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) then
+    return false
+  end
+
+  local bo = vim.bo[bufnr]
+  return bo.buflisted and bo.buftype == "terminal" and vim.b[bufnr].bottom_terminal_session == true
+end
+
 local function is_file_buffer(bufnr)
   if not vim.api.nvim_buf_is_valid(bufnr) then
     return false
@@ -16,6 +25,10 @@ local function is_file_buffer(bufnr)
 
   local bo = vim.bo[bufnr]
   return bo.buflisted and bo.buftype == ""
+end
+
+local function is_tab_buffer(bufnr)
+  return is_file_buffer(bufnr) or is_terminal_session_buffer(bufnr)
 end
 
 local function listed_file_buffers()
@@ -31,7 +44,33 @@ local function listed_file_buffers()
   return buffers
 end
 
-local function current_listed_buffer()
+local function listed_tab_buffers()
+  local buffers = {}
+
+  for _, info in ipairs(vim.fn.getbufinfo({ buflisted = 1 })) do
+    if is_tab_buffer(info.bufnr) then
+      table.insert(buffers, info.bufnr)
+    end
+  end
+
+  table.sort(buffers)
+  return buffers
+end
+
+local function listed_terminal_session_buffers()
+  local buffers = {}
+
+  for _, info in ipairs(vim.fn.getbufinfo({ buflisted = 1 })) do
+    if is_terminal_session_buffer(info.bufnr) then
+      table.insert(buffers, info.bufnr)
+    end
+  end
+
+  table.sort(buffers)
+  return buffers
+end
+
+local function current_file_buffer()
   local current = vim.api.nvim_get_current_buf()
   if is_file_buffer(current) then
     return current
@@ -51,7 +90,7 @@ local function cycle(step)
     return
   end
 
-  local current = current_listed_buffer() or buffers[1]
+  local current = current_file_buffer() or buffers[1]
   local index = 1
 
   for i, bufnr in ipairs(buffers) do
@@ -66,6 +105,10 @@ local function cycle(step)
 end
 
 local function display_name(bufnr)
+  if is_terminal_session_buffer(bufnr) then
+    return vim.api.nvim_buf_get_name(bufnr)
+  end
+
   local name = vim.api.nvim_buf_get_name(bufnr)
   local label = name == "" and "[No Name]" or vim.fn.fnamemodify(name, ":t")
 
@@ -81,6 +124,10 @@ local function display_name(bufnr)
 end
 
 local function file_icon(bufnr)
+  if is_terminal_session_buffer(bufnr) then
+    return " ", nil
+  end
+
   local ok, devicons = pcall(require, "nvim-web-devicons")
   if not ok then
     return "", nil
@@ -214,22 +261,31 @@ function M.prev()
 end
 
 function M.close_current()
-  local current = current_listed_buffer()
+  local current = current_file_buffer()
   if current then
     vim.cmd("bdelete " .. current)
   end
 end
 
 function M.render(_, window)
-  local buffers = listed_file_buffers()
+  local current = vim.api.nvim_win_get_buf(window)
+  local buffers
+
+  if is_terminal_session_buffer(current) then
+    buffers = listed_terminal_session_buffers()
+  else
+    buffers = listed_file_buffers()
+  end
+
   if #buffers == 0 then
     return "%#StatusLine#"
   end
 
-  local current = vim.api.nvim_win_get_buf(window)
-  if not is_file_buffer(current) then
-    current = current_listed_buffer()
+  if not is_terminal_session_buffer(current) and not is_file_buffer(current) then
+    current = current_file_buffer()
   end
+
+  current = current or buffers[1]
 
   local max_width = math.max(20, vim.api.nvim_win_get_width(window) - 12)
   local start_idx, end_idx = visible_buffers(buffers, current, max_width)

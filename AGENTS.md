@@ -17,7 +17,7 @@ Neovim version: **0.12.1** (important — some APIs behave differently, see Note
 | `lua/lsp.lua` | Native Neovim 0.11+ LSP config (`vim.lsp.config` / `vim.lsp.enable`) |
 | `lua/buffer_tabs.lua` | Bottom footer tab/statusline renderer, styling, and next/prev/close helpers |
 | `lua/env-manager.lua` | Auto-loads `.env` on startup; floating editor to edit env vars |
-| `lua/floating_terminal.lua` | Persistent floating terminal implementation |
+| `lua/floating_terminal.lua` | Persistent bottom terminal with multi-session support |
 | `lua/cheatsheet.lua` | Floating cheatsheet popup |
 | `lua/markdown_preview.lua` | Markdown preview in a floating popup |
 | `lua/plugins/` | One file per plugin group |
@@ -241,15 +241,16 @@ Custom IJKL-style layout (replaces default hjkl). Implemented with `vim.cmd("nno
 | `<F1>` / `Cmd+1` | Toggle focus: tree ↔ editor |
 | `<F2>` / `Cmd+Shift+1` | Toggle nvim-tree show/hide |
 | `<F3>` / `Cmd+O` | Find files (Telescope, smart) |
-| `<F4>` / `Cmd+T` | Toggle floating terminal |
+| `<F4>` / `Cmd+T` | Toggle bottom terminal |
 | `<F5>` / `Cmd+F` | Live grep (Telescope) |
-| `<F6>` / `Cmd+[` | Previous file tab |
-| `<F7>` / `Cmd+]` | Next file tab |
+| `<F6>` / `Cmd+[` | Previous file tab, or previous terminal session when terminal is focused |
+| `<F7>` / `Cmd+]` | Next file tab, or next terminal session when terminal is focused |
 | `<leader>fg` | Live grep (Telescope) |
 | `<leader>fb` | Buffers (Telescope) |
 | `<leader>bn` | Next file tab |
 | `<leader>bp` | Previous file tab |
 | `<leader>bx` | Close current file tab |
+| `Option+t` | Create new bottom terminal session |
 
 **nvim-tree buffer keymaps (local to tree):**
 | Keymap | Action |
@@ -358,7 +359,9 @@ Custom IJKL-style layout (replaces default hjkl). Implemented with `vim.cmd("nno
 ### Misc
 | Keymap | Action |
 |---|---|
-| `<leader>\` | Toggle floating terminal (normal + terminal mode) |
+| `<leader>\` | Toggle bottom terminal (normal + terminal mode) |
+| `<leader>tn` | Next terminal session |
+| `<leader>tp` | Previous terminal session |
 | `<leader>z` | Zen mode |
 | `<leader>mp` | Markdown preview popup |
 | `<leader>cv` | CSV table view toggle |
@@ -403,21 +406,23 @@ nvim-tree auto-opens on `VimEnter` via autocmd. Opens without stealing focus (`f
 
 **iTerm2 Cmd+O setup:** Same approach — shortcut `Cmd+O`, action `Send Escape Sequence`, value `[57R`. Neovim receives `\x1b[57R`, translates to `<F3>`, keymap opens smart file finder.
 
-**iTerm2 Cmd+T setup:** Same approach — shortcut `Cmd+T`, action `Send Escape Sequence`, value `[57S`. Neovim receives `\x1b[57S`, translates to `<F4>`, keymap toggles floating terminal (works in both normal and terminal modes).
+**iTerm2 Cmd+T setup:** Same approach — shortcut `Cmd+T`, action `Send Escape Sequence`, value `[57S`. Neovim receives `\x1b[57S`, translates to `<F4>`, keymap toggles the persistent bottom terminal (works in both normal and terminal modes).
+
+**iTerm2 Option+T setup:** Either set the Option key to send `Esc+`, or add a dedicated shortcut `Option+T` with action `Send Escape Sequence` and value `t`. Neovim receives that as `<M-t>`, which creates a new bottom terminal session.
 
 **iTerm2 Cmd+Shift+T setup:** Opens a new iTerm2 tab (configured in iTerm2 → Settings → Profiles → Keys → General: "Cmd+Shift+T" → New Tab).
 
 **iTerm2 Cmd+F setup:** Same approach — shortcut `Cmd+F`, action `Send Escape Sequence`, value `[15~`. Neovim receives `\x1b[15~`, translates to `<F5>`, keymap opens live grep (Telescope).
 
-**iTerm2 Cmd+[ setup:** Same approach — shortcut `Cmd+[`, action `Send Escape Sequence`, value `[17~`. Neovim receives `\x1b[17~`, translates to `<F6>`, keymap moves to the previous buffer tab.
+**iTerm2 Cmd+[ setup:** Same approach — shortcut `Cmd+[`, action `Send Escape Sequence`, value `[17~`. Neovim receives `\x1b[17~`, translates to `<F6>`, keymap moves to the previous file tab, or to the previous terminal session if the focused buffer is one of the managed bottom terminals.
 
-**iTerm2 Cmd+] setup:** Same approach — shortcut `Cmd+]`, action `Send Escape Sequence`, value `[18~`. Neovim receives `\x1b[18~`, translates to `<F7>`, keymap moves to the next buffer tab.
+**iTerm2 Cmd+] setup:** Same approach — shortcut `Cmd+]`, action `Send Escape Sequence`, value `[18~`. Neovim receives `\x1b[18~`, translates to `<F7>`, keymap moves to the next file tab, or to the next terminal session if the focused buffer is one of the managed bottom terminals.
 
 **Smart file finder** (`<leader>ff` / `<F3>` / Cmd+O): Fuzzy searches all project files. Typing a query ending with `/` switches to directory-only results (uses `fd --type d`). Pressing `<CR>` on a directory opens nvim-tree, navigates to that folder, expands it, and places the cursor on it. Implemented as a custom `attach_mappings` wrapper around `telescope.builtin.find_files` in `lua/keymaps.lua`.
 
 **Folder icons:** Uses distinct icons for different folder states (default, open, empty, symlink) with `▸`/`▾` arrows to indicate expand/collapse. Indent markers show folder hierarchy. Icons and colors are configured in `lua/plugins/navigation.lua`.
 
-**Buffer tabs:** Open file tabs are rendered through `bars.nvim` as a custom global statusline (`laststatus=3`), so they appear at the bottom instead of the top. They represent listed file buffers rather than native Neovim tab pages, and non-file buffers (terminal, prompts, scratch buffers, `nvim-tree`) are filtered out of the tab strip. The left side shows IntelliJ-inspired flat tab blocks with file icons; the active tab uses a thin gold left accent while inactive tabs hide that accent. The right side shows compact status metadata (git branch, mode, encoding, filetype, progress, line:column), and when `nvim-tree` is open on the left the tabs are padded so they start after the tree instead of at column 0.
+**Buffer tabs:** Open file tabs are rendered through `bars.nvim` as a custom global statusline (`laststatus=3`), so they appear at the bottom instead of the top. They represent listed file buffers rather than native Neovim tab pages. Managed bottom terminal sessions do not appear in the normal file-tab view; they only replace the tab strip when a managed terminal buffer is focused, so terminal navigation stays isolated from file navigation. The left side shows IntelliJ-inspired flat tab blocks with file icons; the active tab uses a thin gold left accent while inactive tabs hide that accent. The right side shows compact status metadata (git branch, mode, encoding, filetype, progress, line:column), and when `nvim-tree` is open on the left the tabs are padded so they start after the tree instead of at column 0.
 
 ---
 
@@ -446,7 +451,7 @@ Auto-loads `.env` from `cwd` on startup. Parses `KEY=VALUE` lines (handles quote
 ## Popnav (`lua/plugins/popnav.lua`)
 
 Custom popup navigator that manages three floating panels as a group:
-1. **Terminal** — persistent floating terminal
+1. **Terminal** — persistent bottom terminal with multiple sessions
 2. **Cheatsheet** — keymap reference popup
 3. **Claude** — Claude Code panel (with session picker on first open)
 
@@ -456,7 +461,8 @@ Custom popup navigator that manages three floating panels as a group:
 
 - **Motion remapping** uses `vim.cmd("nnoremap ...")` — `vim.keymap.set` and `vim.api.nvim_set_keymap` both fail for single-character key remaps on Neovim 0.12.1.
 - **LSP** uses native Neovim 0.11+ API (`vim.lsp.config` / `vim.lsp.enable`) in `lua/lsp.lua`. The `lua/plugins/lsp.lua` plugin spec also configures via `vim.lsp.config` — there is intentional overlap; the plugin file handles lazy-loading behavior.
-- **Buffer tabs** are powered by a custom `bars.nvim` statusline renderer, not native Neovim tab pages. The active tab strip is shown at the bottom of the editor via the global statusline (`laststatus=3`), includes right-side status metadata, offsets itself when `nvim-tree` is visible on the left, and styles the active tab with a thin left accent while keeping inactive tabs visually flat.
+- **Bottom terminal** uses `lua/floating_terminal.lua` and opens as a persistent bottom split, not a centered modal. It supports multiple sessions: `<F4>`/`Cmd+T` toggles visibility, `Option+t` creates a new session, and `<leader>tn` / `<leader>tp` move between sessions.
+- **Buffer tabs** are powered by a custom `bars.nvim` statusline renderer, not native Neovim tab pages. The active tab strip is shown at the bottom of the editor via the global statusline (`laststatus=3`), includes right-side status metadata, offsets itself when `nvim-tree` is visible on the left, and styles the active tab with a thin left accent while keeping inactive tabs visually flat. Managed terminal sessions are excluded from normal file-tab navigation and only appear in the tab strip while a managed terminal buffer is focused.
 - **bars.nvim** is configured only for the statusline. Its `statuscolumn`, `winbar`, and `tabline` modules remain disabled to avoid replacing the rest of the UI.
 - **Auto-save** is on by default (1s inactivity). Toggle with `<leader>ta`.
 - **Folding** uses `foldmethod=indent` with all folds open by default (`foldlevel=99`).
