@@ -71,6 +71,56 @@ local function display_name(bufnr)
   return label
 end
 
+local function mode_label()
+  local mode = vim.api.nvim_get_mode().mode
+  local labels = {
+    n = "NORMAL",
+    no = "NORMAL",
+    nov = "NORMAL",
+    noV = "NORMAL",
+    ["no\22"] = "NORMAL",
+    i = "INSERT",
+    ic = "INSERT",
+    ix = "INSERT",
+    v = "VISUAL",
+    V = "V-LINE",
+    ["\22"] = "V-BLOCK",
+    c = "COMMAND",
+    R = "REPLACE",
+    s = "SELECT",
+    S = "S-LINE",
+    t = "TERMINAL",
+  }
+
+  return labels[mode] or mode:upper()
+end
+
+local function current_branch(bufnr)
+  local branch = vim.b[bufnr].gitsigns_head
+  if type(branch) == "string" and branch ~= "" then
+    return branch
+  end
+
+  return nil
+end
+
+local function location()
+  return string.format("%d:%d", vim.fn.line("."), vim.fn.col("."))
+end
+
+local function progress()
+  local line = vim.fn.line(".")
+  local total = vim.fn.line("$")
+
+  if line <= 1 then
+    return "Top"
+  elseif line >= total then
+    return "Bot"
+  end
+
+  return string.format("%d%%%%", math.floor((line / math.max(total, 1)) * 100))
+end
+
 local function visible_buffers(buffers, current, max_width)
   if #buffers == 0 then
     return 1, 0
@@ -159,7 +209,22 @@ function M.render(_, window)
     table.insert(parts, "%#TabLine# … ")
   end
 
-  table.insert(parts, "%#StatusLine#%=")
+  local meta = {}
+  local branch = current_branch(current)
+  local encoding = vim.bo[current].fileencoding ~= "" and vim.bo[current].fileencoding or vim.o.encoding
+  local filetype = vim.bo[current].filetype ~= "" and vim.bo[current].filetype or "text"
+
+  if branch then
+    table.insert(meta, " " .. branch)
+  end
+
+  table.insert(meta, mode_label())
+  table.insert(meta, encoding)
+  table.insert(meta, filetype)
+  table.insert(meta, progress())
+  table.insert(meta, location())
+
+  table.insert(parts, "%#StatusLine#%=" .. table.concat(meta, "  "))
   return table.concat(parts, "")
 end
 
