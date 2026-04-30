@@ -14,6 +14,11 @@
 * file explorer: suggestions should start from top, not from bottom
 * why is it that when I open a new line with an open `(` before that new line, it automatically doesn't add a `)`, etc for similar syntax
 * cmd + f to search only in the file, shift + cmd + f to search strings globally
+* telescope find is scoped to a certain folder
+    * you are able to remove certain folders from telescope
+* cmd + shift + p to auto insert suggestion
+* file templates
+* terminal names does not show full path, just terminal 1, terminal 2, etc.
 
   -------------------------------------------
 
