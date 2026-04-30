@@ -19,6 +19,7 @@
 * cmd + shift + p to auto insert suggestion
 * file templates
 * terminal names does not show full path, just terminal 1, terminal 2, etc.
+* a place to configure and save tests and run scripts
 
   -------------------------------------------
 
